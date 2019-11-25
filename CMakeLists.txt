@@ -4,6 +4,8 @@ cmake_minimum_required(VERSION 3.15)
 
 aux_source_directory(src SRC_LISTS)
 
+include_directories(src)
+
 if(SRC_LISTS)
     # Compile srcs to static library
     add_library(${PROJECT_NAME} STATIC ${SRC_LISTS})
