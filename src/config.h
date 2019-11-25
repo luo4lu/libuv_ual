@@ -9,11 +9,13 @@
 
 #include <utility>
 #include <cstddef>
+#include <functional>
 
 namespace UAL_NAMESPACE {
 
 using std::forward;
 using std::size_t;
+using std::function;
 
 }
 

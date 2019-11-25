@@ -2,6 +2,8 @@ project(template)
 
 cmake_minimum_required(VERSION 3.15)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
+
 aux_source_directory(src SRC_LISTS)
 
 include_directories(src)

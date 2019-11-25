@@ -5,9 +5,6 @@ if not type cmake 2>/dev/null; then
     exit 0;
 fi
 
-if [ ! -d "build" ]; then
-    mkdir -p build
-fi
-
-(cd build; cmake ..; make)
+(cmake -S. -Bbuild)
+(make -C build)
 
