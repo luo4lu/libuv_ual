@@ -3,60 +3,105 @@
 
 #include "config.h"
 #include "helper/this_subclass.h"
+#include "executor.h"
 
 namespace UAL_NAMESPACE {
 
 template <class Impl>
-struct Timer: public __this_subclass<Impl>{
+struct timer: public __this_subclass<Impl>{
 
     using __this_subclass<Impl>::sub_this;
 
-    Timer() {
-        sub_this -> init(Impl::NotInit, [](){});
+    using Impl::timeout;
+    using Impl::handler;
+    using Impl::repeat;
+
+    /*
+     * default constructor function is delete.
+     */
+    timer() = delete;
+
+    /*
+     * [temporary] copy constructor function is delete.
+     */
+    timer(const timer &t) = delete;
+
+    /*
+     * use executor to construct timer.
+     */
+    template<class ExecutorImpl>
+    timer(executor<ExecutorImpl> &exec) {
+        sub_this -> init(forward(exec));
+        this -> timeout = 0;
+        this -> handler = [](){};
     }
 
-    Timer(size_t timeout) {
-        sub_this -> init(timeout, [](){});
+    /*
+     * construct timer using timeout.
+     * 
+     * handler is empty. timeout and repeat are in milliseconds.
+     */
+    template<class ExecutorImpl>
+    timer(executor<ExecutorImpl> &exec, size_t timeout) {
+        sub_this -> init(forward(exec));
+        this -> timeout = timeout;
+        this -> handler = [](){};
     }
 
-    Timer(function<void(void)> f) {
-        sub_this -> init(Impl::NotInit, f);
+    /*
+     * construct timer using handler
+     *
+     * timeout is 0.
+     */
+    template<class ExecutorImpl>
+    timer(executor<ExecutorImpl> &exec, function<void(void)> handler) {
+        sub_this -> init(forward(exec));
+        this -> timeout = 0;
+        this -> handler = handler;
     }
 
-    Timer(size_t timeout, function<void(void)> f) {
-        sub_this -> init(timeout, f);
+    /*
+     * construct timer using timeout and handler.
+     */
+    template<class ExecutorImpl>
+    timer(executor<ExecutorImpl> &exec, size_t timeout, function<void(void)> f) {
+        sub_this -> init(forward(exec));
+        this -> timeout = timeout;
+        this -> handler = handler;
     }
 
-    Timer(const Timer &t) {
-        sub_this -> copy(forward(t));
-    }
-
-    ~Timer() {
-        sub_this -> destory();
-    }
-
-    void set_timeout(size_t timeout) {
-        sub_this -> set_timeout(timeout);
-    }
-
-    void set_handler(function<void(void)> f) {
-        sub_this -> set_handler(f);
-    }
-
+    /*
+     * run timer once.
+     */
     bool once() {
-
+        return repeat(1);
     }
 
-    void repeat(size_t timeout, size_t repeat) {
-        sub_this -> repeat(forward<size_t>(timeout), forward<size_t>(repeat));
+    /*
+     * run timer repeated.
+     *
+     * Start the timer.
+     */
+    bool repeat(size_t repeat) {
+        return sub_this -> repeat(repeat);
     }
 
-    void again() {
-
+    /*
+     * restart timer.
+     *
+     * Stop the timer, and if it is repeating restart it using the repeat value as the timeout.
+     */
+    bool again() {
+        return sub_this ->repeat(repeat);
     }
 
+    /*
+     * stop timer.
+     * 
+     * Stop the timer.
+     */
     void stop() {
-
+        return sub_this -> stop();
     }
 };
 

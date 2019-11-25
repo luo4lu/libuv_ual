@@ -10,6 +10,7 @@ struct Test {
         Impl *p = static_cast<Impl*>(this);
         cout<< "call Test constructor" << endl;
         p -> init();
+        p -> i = 1;
     }
 
     Test(const Test &t) = delete;
@@ -31,6 +32,7 @@ struct TestImpl: Test<TestImpl> {
     void destory() {
         cout << "call destory" << endl;
     }
+    int i;
 };
 
 
