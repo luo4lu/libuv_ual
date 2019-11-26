@@ -14,10 +14,6 @@ struct timer: public __this_subclass<Impl>{
 
 public:
 
-    using Impl::timeout;
-    using Impl::handler;
-    using Impl::repeat;
-
     /*
      * default constructor function is delete.
      */
@@ -34,8 +30,8 @@ public:
     template<class ExecutorImpl>
     timer(executor<ExecutorImpl> &exec) {
         sub_this -> init(forward(exec));
-        this -> timeout = 0;
-        this -> handler = [](){};
+        sub_this -> timeout = 0;
+        sub_this -> handler = [](){};
     }
 
     /*
@@ -46,8 +42,8 @@ public:
     template<class ExecutorImpl>
     timer(executor<ExecutorImpl> &exec, size_t timeout) {
         sub_this -> init(forward(exec));
-        this -> timeout = timeout;
-        this -> handler = [](){};
+        sub_this -> timeout = timeout;
+        sub_this -> handler = [](){};
     }
 
     /*
@@ -58,18 +54,18 @@ public:
     template<class ExecutorImpl>
     timer(executor<ExecutorImpl> &exec, function<void(void)> handler) {
         sub_this -> init(forward(exec));
-        this -> timeout = 0;
-        this -> handler = handler;
+        sub_this -> timeout = 0;
+        sub_this -> handler = handler;
     }
 
     /*
      * construct timer using timeout and handler.
      */
     template<class ExecutorImpl>
-    timer(executor<ExecutorImpl> &exec, size_t timeout, function<void(void)> f) {
+    timer(executor<ExecutorImpl> &exec, size_t timeout, function<void(void)> handler) {
         sub_this -> init(forward(exec));
-        this -> timeout = timeout;
-        this -> handler = handler;
+        sub_this -> timeout = timeout;
+        sub_this -> handler = handler;
     }
 
     /*

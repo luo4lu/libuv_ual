@@ -28,6 +28,8 @@ struct Test {
 };
 
 struct TestImpl: public Test<TestImpl> {
+    friend Test<TestImpl>;
+
     void init() {
         cout << "call init" << endl;
         this -> i = 1;
@@ -46,6 +48,10 @@ template <class Impl>
 void call_t(Test<Impl> &t) {
     cout << t.get_i() << endl;
 }
+
+struct TimerTest: public ual::timer<TimerTest> {
+
+};
 
 int main() {
     TestImpl t;
