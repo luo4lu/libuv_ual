@@ -41,13 +41,13 @@ public:
      * run executor forever or until all futures/event executed.
      */
     int start() {
-        return sub_this -> run(Impl::Default);
+        return sub_this -> run(Impl::RunType::Default);
     }
 
     /*
      * stop executor.
      */
-    int stop() {
+    void stop() {
         return sub_this -> stop();
     }
 
@@ -58,14 +58,14 @@ public:
      * execute one future/event.
      */
     int once() {
-        return sub_this -> run(Impl::Once);
+        return sub_this -> run(Impl::RunType::Once);
     }
 
     /*
      * poll executor.
      */
     int poll() {
-        return sub_this -> run(Impl::Poll);
+        return sub_this -> run(Impl::RunType::Poll);
     }
 
     /*
