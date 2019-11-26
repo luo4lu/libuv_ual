@@ -81,7 +81,8 @@ public:
      * Start the timer.
      */
     bool repeat(size_t repeat) {
-        return sub_this -> repeat(repeat);
+        _repeat = repeat;
+        return sub_this -> repeat(_repeat);
     }
 
     /*
@@ -90,7 +91,7 @@ public:
      * Stop the timer, and if it is repeating restart it using the repeat value as the timeout.
      */
     bool again() {
-        return sub_this ->repeat(repeat);
+        return sub_this ->repeat(_repeat);
     }
 
     /*
@@ -101,6 +102,8 @@ public:
     void stop() {
         return sub_this -> stop();
     }
+
+    size_t _repeat;
 };
 
 }
