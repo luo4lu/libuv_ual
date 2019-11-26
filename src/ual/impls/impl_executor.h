@@ -3,13 +3,14 @@
 
 #include "config.h"
 #include "ual/executor.h"
+#include <uv.h>
 
 namespace ual {
 
 class libuv_executor: executor<libuv_executor> {
 public: 
     enum class RunType {
-        Default,
+        Default = 0,
         Once,
         Poll,
     };
@@ -20,15 +21,15 @@ public:
 
     int run(RunType t);
     
-    int stop();
+    void stop();
 
     int64_t now();
 
 friend executor<libuv_executor>;
 
 private:
-    size_t timeout;
-    function<void(void)> handler;
+    uv_loop_t loop;
+  //  uv_run_mode mode;
 };
 
 
