@@ -23,6 +23,12 @@ public:
     int stop();
 
     int64_t now();
+
+friend executor<libuv_executor>;
+
+private:
+    size_t timeout;
+    function<void(void)> handler;
 };
 
 
