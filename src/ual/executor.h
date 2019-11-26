@@ -10,6 +10,8 @@ template<class Impl>
 class executor: public __this_subclass<Impl> {
     using __this_subclass<Impl>::sub_this;
 
+public:
+
     /*
      * default constructor function.
      *

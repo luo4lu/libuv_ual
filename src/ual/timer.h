@@ -12,6 +12,8 @@ struct timer: public __this_subclass<Impl>{
 
     using __this_subclass<Impl>::sub_this;
 
+public:
+
     using Impl::timeout;
     using Impl::handler;
     using Impl::repeat;
