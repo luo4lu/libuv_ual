@@ -6,11 +6,11 @@ using namespace std;
 
 template<class Impl>
 struct Test {
+
     Test() {
         Impl *p = static_cast<Impl*>(this);
         cout<< "call Test constructor" << endl;
         p -> init();
-        p -> i = 1;
     }
 
     Test(const Test &t) = delete;
@@ -20,24 +20,36 @@ struct Test {
         cout<< "call Test destory" << endl;
         p -> destory();
     }
+
+    int get_i() {
+        return 1;
+    }
+
 };
 
-struct TestImpl: Test<TestImpl> {
-    using Test::Test;
-
+struct TestImpl: public Test<TestImpl> {
     void init() {
         cout << "call init" << endl;
+        this -> i = 1;
     }
 
     void destory() {
         cout << "call destory" << endl;
     }
+
+    using Test<TestImpl>::Test;
+
     int i;
 };
 
+template <class Impl>
+void call_t(Test<Impl> &t) {
+    cout << t.get_i() << endl;
+}
 
 int main() {
-    Test<TestImpl> t;
+    TestImpl t;
+    call_t(t);
     return 0;
 }
 
