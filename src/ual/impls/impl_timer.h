@@ -12,19 +12,22 @@ public:
     template<class ExecutorImpl>
     int init(executor<ExecutorImpl> &exec);
 
-    uint64_t repeat(size_t _repeat);
+    int repeat(size_t repeat);
 
     int stop();
 
     void destory();
 
     friend timer<libuv_timer>;
-private:
+
+public:
     size_t timeout;
-    uv_timer_t time;
-    function<void(void)> handle;
+    function<void(void)> handler;
+    
+private:
+    uv_timer_t _timer;
     const uv_loop_t *t_loop;
-}
+};
 
 }
 
