@@ -6,7 +6,10 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS YES)
 
 file(GLOB_RECURSE CPP_SRC_LISTS src/*.cpp)
 
+add_subdirectory(deps/libuv)
+
 include_directories(src)
+include_directories(deps/libuv/include)
 
 if(CPP_SRC_LISTS)
     # Compile srcs to static library

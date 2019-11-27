@@ -25,6 +25,14 @@ public:
     timer(const timer &t) = delete;
 
     /*
+    * destructor function
+    * close timer and free resources
+    */
+    ~timer(){
+        sub_this->destory();
+    }
+
+    /*
      * use executor to construct timer.
      */
     template<class ExecutorImpl>
@@ -62,7 +70,7 @@ public:
      * construct timer using timeout and handler.
      */
     template<class ExecutorImpl>
-    timer(executor<ExecutorImpl> &exec, size_t timeout, function<void(void)> handler) {
+    timer(executor<ExecutorImpl> &exec, size_t timeout,function<void(void)> handler) {
         sub_this -> init(forward(exec));
         sub_this -> timeout = timeout;
         sub_this -> handler = handler;
