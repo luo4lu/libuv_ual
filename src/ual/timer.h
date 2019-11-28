@@ -10,6 +10,7 @@ namespace UAL_NAMESPACE {
 template <class Impl>
 class timer: public __this_subclass<Impl>{
 
+public:
     using __this_subclass<Impl>::sub_this;
 
 public:
@@ -17,7 +18,7 @@ public:
      * run timer once.
      */
     bool once() {
-        return repeat(1);
+        return sub_this ->start(1);
     }
 
     /*
@@ -27,7 +28,7 @@ public:
      */
     bool repeat(size_t repeat) {
         _repeat = repeat;
-        return sub_this -> repeat(_repeat);
+        return sub_this -> start(_repeat);
     }
 
     /*
@@ -36,7 +37,7 @@ public:
      * Stop the timer, and if it is repeating restart it using the repeat value as the timeout.
      */
     bool again() {
-        return sub_this ->repeat(_repeat);
+        return sub_this ->start(_repeat);
     }
 
     /*
