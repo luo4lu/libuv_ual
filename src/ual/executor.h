@@ -11,30 +11,6 @@ class executor: public __this_subclass<Impl> {
     using __this_subclass<Impl>::sub_this;
 
 public:
-
-    /*
-     * default constructor function.
-     *
-     * create event loop or future's executor
-     */
-    executor() {
-        sub_this -> init();
-    }
-
-    /*
-     * copy constructor function is delete.
-     */
-    executor(const executor &exec) = delete;
-
-    /*
-     * destructor function.
-     *
-     * close executor and free resources.
-     */
-    ~executor() {
-        sub_this -> destory();
-    }
-
     /*
      * start executor.
      *

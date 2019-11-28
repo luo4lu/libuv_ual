@@ -25,9 +25,8 @@ public:
 
     int64_t now();
 
-friend executor<libuv_executor>;
-
 public:
+    class _inner_type {};
     uv_loop_t loop;
   //  uv_run_mode mode;
 };
