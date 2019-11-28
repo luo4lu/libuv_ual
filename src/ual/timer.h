@@ -37,7 +37,7 @@ public:
      */
     template<class ExecutorImpl>
     timer(const executor<ExecutorImpl> &exec) {
-        sub_this -> init(forward(exec));
+        sub_this -> init(exec);
         sub_this -> timeout = 0;
         sub_this -> handler = [](){};
     }
@@ -49,7 +49,7 @@ public:
      */
     template<class ExecutorImpl>
     timer(const executor<ExecutorImpl> &exec, size_t timeout) {
-        sub_this -> init(forward(exec));
+        sub_this -> init(exec);
         sub_this -> timeout = timeout;
         sub_this -> handler = [](){};
     }
@@ -61,7 +61,7 @@ public:
      */
     template<class ExecutorImpl>
     timer(const executor<ExecutorImpl> &exec, function<void(void)> handler) {
-        sub_this -> init(forward(exec));
+        sub_this -> init(exec);
         sub_this -> timeout = 0;
         sub_this -> handler = handler;
     }
@@ -71,7 +71,7 @@ public:
      */
     template<class ExecutorImpl>
     timer(const executor<ExecutorImpl> &exec, size_t timeout,function<void(void)> handler) {
-        sub_this -> init(forward(exec));
+        sub_this -> init(exec);
         sub_this -> timeout = timeout;
         sub_this -> handler = handler;
     }

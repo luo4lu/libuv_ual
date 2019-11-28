@@ -27,7 +27,7 @@ public:
 
 friend executor<libuv_executor>;
 
-private:
+public:
     uv_loop_t loop;
   //  uv_run_mode mode;
 };
