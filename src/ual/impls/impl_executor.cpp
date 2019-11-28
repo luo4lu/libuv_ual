@@ -1,7 +1,7 @@
 #include "ual/impls/impl_executor.h"
 
 namespace ual {
-void libuv_executor::init()
+/*void libuv_executor::init()
 {
     uv_loop_init(&loop);
 }
@@ -9,7 +9,7 @@ void libuv_executor::init()
 void libuv_executor::destory()
 {
     uv_loop_close(&loop);
-}
+}*/
 
 int libuv_executor::run(RunType t)
 {

@@ -8,16 +8,24 @@
 namespace ual {
 
 class libuv_executor: public executor<libuv_executor> {
+
 public: 
     enum class RunType {
         Default = 0,
         Once,
         Poll,
     };
+    libuv_executor()
+    {
+        uv_loop_init(&loop);
+    }
+    ~libuv_executor()
+    {
+        uv_loop_close(&loop);
+    }
+ //   void init();
 
-    void init();
-
-    void destory();
+ //   void destory();
 
     int run(RunType t);
     
@@ -27,9 +35,10 @@ public:
 
 friend executor<libuv_executor>;
 
-public:
+protected:
+   // typedef uv_loop_t type_loop_t;
     uv_loop_t loop;
-  //  uv_run_mode mode;
+  
 };
 
 

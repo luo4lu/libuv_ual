@@ -17,23 +17,23 @@ public:
      *
      * create event loop or future's executor
      */
-    executor() {
+    /*executor() {
         sub_this -> init();
-    }
+    }*/
 
     /*
      * copy constructor function is delete.
      */
-    executor(const executor &exec) = delete;
+    //executor(const executor &exec) = delete;
 
     /*
      * destructor function.
      *
      * close executor and free resources.
      */
-    ~executor() {
+    /*~executor() {
         sub_this -> destory();
-    }
+    }*/
 
     /*
      * start executor.
@@ -76,6 +76,7 @@ public:
     int64_t now() {
         return sub_this -> now();
     }
+
 };
 
 }
