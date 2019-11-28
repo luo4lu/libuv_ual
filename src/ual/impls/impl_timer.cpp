@@ -3,9 +3,9 @@
 
 namespace ual{
 
-static void timer_cb (uv_timer_t* handle) {
-    auto data = uv_handle_get_data(static_cast<uv_handle_t>(handle));
-    auto timer = static_cast<libuv_timer>(data);
+static void timer_cb (uv_timer_t *handle) {
+    auto data = uv_handle_get_data(reinterpret_cast<uv_handle_t*>(handle));
+    auto timer = static_cast<libuv_timer *>(data);
     timer->handler();
 }
 
@@ -14,7 +14,7 @@ static void timer_cb (uv_timer_t* handle) {
     {
         auto *loop = &(exec.loop);
         this->t_loop = static_cast<ExecutorImpl>(loop);
-        uv_handle_set_data(static_cast<uv_handle_t*>(this->_timer), this);
+        uv_handle_set_data(const_cast<uv_handle_t*>(&(this->_timer)), this);
         return uv_timer_init(this->t_loop,&(this->_timer));
     }
 
