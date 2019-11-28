@@ -9,6 +9,8 @@ namespace ual{
 
 class libuv_timer:public timer<libuv_timer>{
 public:
+    using timer<libuv_timer>::timer;
+
     template<class ExecutorImpl>
     int init(executor<ExecutorImpl> &exec);
 

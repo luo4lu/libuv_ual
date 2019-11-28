@@ -2,13 +2,13 @@
 #define _UAL_TIMER
 
 #include "config.h"
-#include "helper/this_subclass.h"
-#include "executor.h"
+#include "ual/helper/this_subclass.h"
+#include "ual/executor.h"
 
 namespace UAL_NAMESPACE {
 
 template <class Impl>
-struct timer: public __this_subclass<Impl>{
+class timer: public __this_subclass<Impl>{
 
     using __this_subclass<Impl>::sub_this;
 
@@ -36,7 +36,7 @@ public:
      * use executor to construct timer.
      */
     template<class ExecutorImpl>
-    timer(executor<ExecutorImpl> &exec) {
+    timer(const executor<ExecutorImpl> &exec) {
         sub_this -> init(forward(exec));
         sub_this -> timeout = 0;
         sub_this -> handler = [](){};
@@ -48,7 +48,7 @@ public:
      * handler is empty. timeout and repeat are in milliseconds.
      */
     template<class ExecutorImpl>
-    timer(executor<ExecutorImpl> &exec, size_t timeout) {
+    timer(const executor<ExecutorImpl> &exec, size_t timeout) {
         sub_this -> init(forward(exec));
         sub_this -> timeout = timeout;
         sub_this -> handler = [](){};
@@ -60,7 +60,7 @@ public:
      * timeout is 0.
      */
     template<class ExecutorImpl>
-    timer(executor<ExecutorImpl> &exec, function<void(void)> handler) {
+    timer(const executor<ExecutorImpl> &exec, function<void(void)> handler) {
         sub_this -> init(forward(exec));
         sub_this -> timeout = 0;
         sub_this -> handler = handler;
@@ -70,7 +70,7 @@ public:
      * construct timer using timeout and handler.
      */
     template<class ExecutorImpl>
-    timer(executor<ExecutorImpl> &exec, size_t timeout,function<void(void)> handler) {
+    timer(const executor<ExecutorImpl> &exec, size_t timeout,function<void(void)> handler) {
         sub_this -> init(forward(exec));
         sub_this -> timeout = timeout;
         sub_this -> handler = handler;

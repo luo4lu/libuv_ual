@@ -7,7 +7,7 @@
 
 namespace ual {
 
-class libuv_executor: executor<libuv_executor> {
+class libuv_executor: public executor<libuv_executor> {
 public: 
     enum class RunType {
         Default = 0,

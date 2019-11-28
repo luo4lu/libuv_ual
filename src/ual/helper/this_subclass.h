@@ -8,10 +8,10 @@ namespace UAL_NAMESPACE {
 template <class Impl>
 struct __this_subclass {
 
-    const Impl *sub_this;
+    Impl *sub_this;
 
     __this_subclass() {
-        this -> sub_this = static_cast<Impl>(this);
+        this -> sub_this = static_cast<Impl*>(this);
     }
 };
 
