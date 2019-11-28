@@ -52,6 +52,7 @@ public:
     int64_t now() {
         return sub_this -> now();
     }
+
 };
 
 }

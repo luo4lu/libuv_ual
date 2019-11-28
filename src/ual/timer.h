@@ -13,69 +13,6 @@ class timer: public __this_subclass<Impl>{
     using __this_subclass<Impl>::sub_this;
 
 public:
-
-    /*
-     * default constructor function is delete.
-     */
-    timer() = delete;
-
-    /*
-     * [temporary] copy constructor function is delete.
-     */
-    timer(const timer &t) = delete;
-
-    /*
-    * destructor function
-    * close timer and free resources
-    */
-    ~timer(){
-        sub_this->destory();
-    }
-
-    /*
-     * use executor to construct timer.
-     */
-    template<class ExecutorImpl>
-    timer(const executor<ExecutorImpl> &exec) {
-        sub_this -> init(exec);
-        sub_this -> timeout = 0;
-        sub_this -> handler = [](){};
-    }
-
-    /*
-     * construct timer using timeout.
-     * 
-     * handler is empty. timeout and repeat are in milliseconds.
-     */
-    template<class ExecutorImpl>
-    timer(const executor<ExecutorImpl> &exec, size_t timeout) {
-        sub_this -> init(exec);
-        sub_this -> timeout = timeout;
-        sub_this -> handler = [](){};
-    }
-
-    /*
-     * construct timer using handler
-     *
-     * timeout is 0.
-     */
-    template<class ExecutorImpl>
-    timer(const executor<ExecutorImpl> &exec, function<void(void)> handler) {
-        sub_this -> init(exec);
-        sub_this -> timeout = 0;
-        sub_this -> handler = handler;
-    }
-
-    /*
-     * construct timer using timeout and handler.
-     */
-    template<class ExecutorImpl>
-    timer(const executor<ExecutorImpl> &exec, size_t timeout,function<void(void)> handler) {
-        sub_this -> init(exec);
-        sub_this -> timeout = timeout;
-        sub_this -> handler = handler;
-    }
-
     /*
      * run timer once.
      */

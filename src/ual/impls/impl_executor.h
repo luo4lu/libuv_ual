@@ -8,6 +8,7 @@
 namespace ual {
 
 class libuv_executor: public executor<libuv_executor> {
+
 public: 
     enum class RunType {
         Default = 0,
@@ -15,20 +16,26 @@ public:
         Poll,
     };
 
-    void init();
+    libuv_executor() {
+        uv_loop_init(&loop);
+    }
 
-    void destory();
+    libuv_executor(const libuv_executor&) = delete;
+
+    ~libuv_executor() {
+        uv_loop_close(&loop);
+    }
 
     int run(RunType t);
     
     void stop();
 
     int64_t now();
+friend class libuv_timer;
 
-public:
-    class _inner_type {};
+private:
     uv_loop_t loop;
-  //  uv_run_mode mode;
+  
 };
 
 
