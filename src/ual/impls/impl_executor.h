@@ -32,6 +32,7 @@ public:
 
     int64_t now();
 friend class libuv_timer;
+friend class libuv_file;
 
 private:
     uv_loop_t loop;
