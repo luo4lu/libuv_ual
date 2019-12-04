@@ -14,9 +14,7 @@ class file:public __this_subclass<Impl> {
     using __this_subclass<Impl>::sub_this;
 
 public:
-    typedef int flag_t;
     typedef int offset_t;
-    typedef int mode_t;
     
     enum class flag_t {
         RD,
@@ -39,7 +37,7 @@ public:
      * @return
      * 
      */
-    void open(const string &_path, flag_t flag, function<void(errcode_t _errcode)> callback)
+    void open(const string &_path, int flag, function<void(errcode_t _errcode)> callback)
     {
         sub_this->on_open(_path,flag,callback);
     }
