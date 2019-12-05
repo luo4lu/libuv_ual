@@ -33,7 +33,7 @@ public:
             uv_fs_req_cleanup(&write_req);
     }
 
-    void on_open(const string &_path, int flag, function<void(errcode_t _errcode)> _callback);
+    void on_open(const string &_path, flag_t flag, function<void(errcode_t _errcode)> _callback);
     
     void on_read(size_t length, offset_t offset, function<void(errcode_t _errcode, string _data)> _callback);
     
@@ -67,7 +67,7 @@ static void on_file_open(uv_fs_t *_fs) {
     }
 }
 
-void libuv_file::on_open(const string &_path, int flag,function<void(errcode_t _errcode)> _callback)
+void libuv_file::on_open(const string &_path, flag_t flag,function<void(errcode_t _errcode)> _callback)
 {   
     uv_handle_set_data(reinterpret_cast<uv_handle_t*>(&(this->open_req)),this);
     
@@ -131,7 +131,6 @@ int libuv_file::on_close()
 {
     uv_fs_t close_req;
     return uv_fs_close(this->_loop,&close_req,this->open_req.result,NULL);
-   // uv_fs_req_cleanup(&(this->_file));
 }
 
 }

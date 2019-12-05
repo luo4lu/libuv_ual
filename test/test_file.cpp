@@ -25,8 +25,9 @@ int main()
     libuv_executor executor;
     const string path="./test/file_txt.txt";
     libuv_file f(executor);
-    f.open(path,O_RDWR ,[&f](libuv_file::errcode_t _code){
+    f.open(path,libuv_file::flag_t::RD),[&f](libuv_file::errcode_t _code){
         if(_code != libuv_file::errcode_t::success) {
+            cout<<"open file faild\n";
             return;
         } else {
             f.write("helloworld\n", -1, [&f](file<libuv_file>::errcode_t _code){

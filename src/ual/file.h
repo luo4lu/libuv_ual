@@ -31,19 +31,31 @@ public:
     /*
      * @brief open file start.
      *
-     * xxxx
+     * @author luoshilu
      * 
      * @params 
-     * @return
+     * _path:need open the file path
+     * flag : set open file properties in the enum flag_t select
+     * callback :runing callback function 
      * 
+     * @return NULL 
      */
-    void open(const string &_path, int flag, function<void(errcode_t _errcode)> callback)
+    void open(const string &_path, flag_t flag, function<void(errcode_t _errcode)> callback)
     {
         sub_this->on_open(_path,flag,callback);
     }
     
     /*
      * @brief read file.
+     *
+     * @author luoshilu
+     * 
+     * @params 
+     * lenght :read string lenght in the file
+     * offset : Read the offset the file character
+     * callback :runing callback function 
+     * 
+     * @return NULL 
      */
     void read(size_t length, offset_t offset, function<void(errcode_t _errcode, string _data)> callback)
     {
@@ -51,7 +63,16 @@ public:
     }
 
     /*
-     * write file
+     * @brief write file
+     *
+     * @author luoshilu
+     * 
+     * @params 
+     * data :Weites string to the file
+     * offset : write the offset the file character
+     * callback :runing callback function 
+     * 
+     * @return NULL 
      */
     void write(const string &data, offset_t offset, function<void(errcode_t _errcode)> callback)
     {
@@ -60,13 +81,18 @@ public:
 
     /*
      * @brief close file and save
+     *
+     * @author luoshilu
+     * 
+     * @params NULL
+     * 
+     * @return int value close file Success or faild
      */
     int close()
     {
         return sub_this->on_close();
     }
 
-   // char *_pbuf;
 };
 }
 #endif
