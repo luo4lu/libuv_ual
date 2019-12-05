@@ -56,11 +56,11 @@ private:
     //uv_fs_t _file;
     uv_loop_t *_loop;
     
-    const int __map[] = { 
-        O_RDONLY | O_CREAT,
-        O_WRONLY | O_CREAT,
-        O_RDWR | O_CREAT,
-    }
+    const int __map[3] = { 
+        UV_FS_O_RDONLY | UV_FS_O_CREAT,
+        UV_FS_O_WRONLY | UV_FS_O_CREAT,
+        UV_FS_O_RDWR | UV_FS_O_CREAT,
+    };
     
 };
 
@@ -78,7 +78,7 @@ void libuv_file::on_open(const string &_path, flag_t flag,function<void(errcode_
 {   
     uv_handle_set_data(reinterpret_cast<uv_handle_t*>(&(this->open_req)),this);
     
-    auto result = uv_fs_open(this->_loop,&(this->open_req),_path.c_str(),this->__map[(int)flag],0,on_file_open);
+    auto result = uv_fs_open(this->_loop,&(this->open_req),_path.c_str(),this->__map[(int)flag],S_IRUSR | S_IWUSR | S_IRGRP | S_IROTH,on_file_open);
     if (result < 0) {
         _callback(file<libuv_file>::errcode_t::open_faild);
     }
@@ -134,6 +134,7 @@ void libuv_file::on_write(const string &data, offset_t offset, function<void(err
     }
     this->write_callback = _callback;
 }
+
 int libuv_file::on_close()
 {
     uv_fs_t close_req;

@@ -28,6 +28,7 @@ public:
         write_faild,
         read_faild
     };
+
     /*
      * @brief open file start.
      *

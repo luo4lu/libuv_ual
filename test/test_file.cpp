@@ -25,20 +25,20 @@ int main()
     libuv_executor executor;
     const string path="./test/file_txt.txt";
     libuv_file f(executor);
-    f.open(path,libuv_file::flag_t::RD),[&f](libuv_file::errcode_t _code){
+    f.open(path,libuv_file::flag_t::RDWD,[&f,path](libuv_file::errcode_t _code){
         if(_code != libuv_file::errcode_t::success) {
-            cout<<"open file faild\n";
+            cout<<"open file faild"<<(int)_code<<endl;
             return;
         } else {
-            f.write("helloworld\n", -1, [&f](file<libuv_file>::errcode_t _code){
+            f.write("helloworld!\naaaaaabbbbbb", 11, [&f](file<libuv_file>::errcode_t _code){
                 if(_code != file<libuv_file>::errcode_t::success) {
                     cout << "success" << endl;
                     return;
-                } else {
+                }else{
                     f.read(11, 0, [&f](libuv_file::errcode_t _code, string data){
                         cout << data << endl;
                         f.close();
-                    });
+                });
                 }
             });
         }
