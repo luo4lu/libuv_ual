@@ -17,7 +17,7 @@ public:
     typedef int offset_t;
     
     enum class flag_t {
-        RD,
+        RD = 0,
         WR,
         RDWD,
     };
