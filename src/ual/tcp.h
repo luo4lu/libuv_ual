@@ -3,7 +3,7 @@
 
 #include "config.h"
 #include "ual/helper/this_subclass.h"
-#include "ual/executr.h"
+#include "ual/executor.h"
 #include <string>
 
 using namespace std;
@@ -18,6 +18,7 @@ public:
         IPV4 =0,
         IPV6
     };
+    typedef int backlog;
 public:
     int bind(const string & ipaddr,ip_type type, int port)
     {
@@ -29,16 +30,23 @@ public:
         return sub_this->tcp_connect(tcp_call);
     }
 
-    int listen()
+    int listen(backlog num,function<void(void)> connection_call)
     {
-        return sub_this->tcp_listen();
+        return sub_this->listen_stream(num,connection_call);
     }
 
-    void abort(string &ipaddr)
+    int accept()
     {
-        sub_this->tcp_abort(ipaddr);
+        return sub_this->accept_data();
     }
 
-}
+    void shutdown(function<void(void)> shutdown_cb)
+    {
+        sub_this->tcp_shutdown(shutdown_cb);
+    }
+
+};
 
 } // namespace UAL_NAMESPACE0
+
+#endif
