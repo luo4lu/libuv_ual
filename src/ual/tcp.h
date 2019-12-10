@@ -18,6 +18,10 @@ public:
         IPV4 =0,
         IPV6
     };
+    enum class point_mode{
+        CLIENT = 0,
+        SERVER
+    };
     typedef int backlog;
 public:
     int bind(const string & ipaddr,ip_type type, int port)
@@ -25,9 +29,9 @@ public:
         return sub_this->tcp_bind(ipaddr,type, port);
     }
 
-    int connect(function<void(void)> tcp_call)
+    int connect(ip_type type, function<void(void)> tcp_call)
     {
-        return sub_this->tcp_connect(tcp_call);
+        return sub_this->tcp_connect(type,tcp_call);
     }
 
     int listen(backlog num,function<void(void)> connection_call)
