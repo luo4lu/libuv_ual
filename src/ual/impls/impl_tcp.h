@@ -118,7 +118,6 @@ int libuv_tcp::listen_stream(backlog num,function<void(void)> s_listen_call)
 
 int libuv_tcp::accept_data()
 {
-    //libuv_tcp *that = (libuv_tcp *)this->stream_server.data;
     uv_stream_t acc_client;
     uv_tcp_init(this->_tloop,(uv_tcp_t*)&acc_client);
     return uv_accept((uv_stream_t *)(&(this->_tserver)),&acc_client);

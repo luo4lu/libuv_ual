@@ -3,7 +3,10 @@
 
 #include "config.h"
 #include "ual/helper/this_subclass.h"
-#include "ual/executr.h"
+#include "ual/executor.h"
+#include <string>
+
+using namespace std;
 
 namespace UAL_NAMESPACE{
 
@@ -18,9 +21,9 @@ public:
         sub_this->read_data(len,buf,recv_call);
     }
 
-    void send(string &buf,function<void(string _buf)> send_call)
+    void send(string &buf,int nbuf, function<void(void)> send_call)
     {
-        sub_this->send_data(buf,send_call);
+        sub_this->send_data(buf, nbuf, send_call);
     }
 
     int stop()
@@ -31,3 +34,5 @@ public:
 
 
 }
+
+#endif

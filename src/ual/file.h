@@ -31,8 +31,6 @@ public:
 
     /*
      * @brief open file start.
-     *
-     * @author luoshilu
      * 
      * @params 
      * _path:need open the file path
@@ -48,15 +46,13 @@ public:
     
     /*
      * @brief read file.
-     *
-     * @author luoshilu
      * 
      * @params 
      * lenght :read string lenght in the file
      * offset : Read the offset the file character
      * callback :runing callback function 
      * 
-     * @return NULL 
+     * @return 
      */
     void read(size_t length, offset_t offset, function<void(errcode_t _errcode, string _data)> callback)
     {
@@ -65,15 +61,13 @@ public:
 
     /*
      * @brief write file
-     *
-     * @author luoshilu
      * 
      * @params 
      * data :Weites string to the file
      * offset : write the offset the file character
      * callback :runing callback function 
      * 
-     * @return NULL 
+     * @return 
      */
     void write(const string &data, offset_t offset, function<void(errcode_t _errcode)> callback)
     {
@@ -82,8 +76,6 @@ public:
 
     /*
      * @brief close file and save
-     *
-     * @author luoshilu
      * 
      * @params NULL
      * 
