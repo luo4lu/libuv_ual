@@ -11,24 +11,21 @@ namespace ual{
 
 class libuv_stream: public stream<libuv_stream>{
 public:
-    /*
-    *use tcp class to construct libuv_stream
-    */
-    template<class TcpImpl> 
-    libuv_stream(const executor<TcpImpl> &tcp):
-    _tstream(const_cast<uv_loop_t *>(&(static_cast<const TcpImpl*>(&tcp)->loop)))
-    {};
+    
+    libuv_stream(){
+    }
 
-    void read_data(size_t len,string &buf,function<void(string _buf,size_t _len)> recv_call);
+    void recv_data(size_t len,string &buf,function<void(const string &_buf,size_t _len)> recv_call);
 
-    void send_data(string &buf,int nbuf, function<void(void)> send_call);
+    void send_data(const string &buf,int nbuf, function<void(void)> send_call);
 
-    int stopread_data();
+    int stoprecv_data();
 
+    friend class libuv_tcp;
 public:
-    function<void(string _buf,size_t _len)> _recv_call;
+    function<void(const string &_buf,size_t _len)> _recv_call;
     function<void(void)> _send_call;
-    uv_stream_t *_tstream;
+    uv_stream_t _tstream;
     uv_write_t _wreq;
  //   uv_buf_t _tbuf;
 };
@@ -43,7 +40,7 @@ static void alloc_cb(uv_handle_t *handle,size_t suggested_size,uv_buf_t *buf)
     _str->_recv_call(buf->base,buf->len);
 }
 
-static void read_cb(uv_stream_t *_hstream,ssize_t nread,const uv_buf_t *buf)
+static void recv_cb(uv_stream_t *_hstream,ssize_t nread,const uv_buf_t *buf)
 {
     auto data = uv_handle_get_data(reinterpret_cast<uv_handle_t *>(_hstream));
     auto _read = static_cast<libuv_stream *>(data);
@@ -52,12 +49,12 @@ static void read_cb(uv_stream_t *_hstream,ssize_t nread,const uv_buf_t *buf)
     _read->_recv_call(buf->base,buf->len);
 }
 
-void libuv_stream::read_data(size_t len,string &buf,function<void(string _buf,size_t _len)> recv_call)
+void libuv_stream::recv_data(size_t len,string &buf,function<void(const string &_buf,size_t _len)> recv_call)
 {
-    uv_handle_set_data(reinterpret_cast<uv_handle_t*>(this->_tstream),this);
+    uv_handle_set_data(reinterpret_cast<uv_handle_t*>(&(this->_tstream)),this);
     this->_recv_call = recv_call;
     uv_buf_init(const_cast<char *>(buf.c_str()),buf.length());
-    uv_read_start(this->_tstream,alloc_cb,read_cb);
+    uv_read_start(&(this->_tstream),alloc_cb,recv_cb);
 }
 
 static void send_cb(uv_write_t *req, int status)
@@ -69,17 +66,17 @@ static void send_cb(uv_write_t *req, int status)
     _send->_send_call();
 }
 
-void libuv_stream::send_data(string &buf,int nbuf, function<void(void)> send_call)
+void libuv_stream::send_data(const string &buf,int nbuf, function<void(void)> send_call)
 {
     uv_handle_set_data(reinterpret_cast<uv_handle_t*>(&(this->_wreq)),this);
     this->_send_call = send_call;
     uv_buf_t _tbuf = uv_buf_init(const_cast<char *>(buf.c_str()),buf.length());
-    uv_write(&(this->_wreq),this->_tstream,&_tbuf,nbuf,send_cb);
+    uv_write(&(this->_wreq),&(this->_tstream),&_tbuf,nbuf,send_cb);
 }
 
-int libuv_stream::stopread_data()
+int libuv_stream::stoprecv_data()
 {
-    return uv_read_stop(this->_tstream);
+    return uv_read_stop(&(this->_tstream));
 }
 
 }

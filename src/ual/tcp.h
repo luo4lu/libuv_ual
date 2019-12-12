@@ -4,6 +4,7 @@
 #include "config.h"
 #include "ual/helper/this_subclass.h"
 #include "ual/executor.h"
+#include "ual/stream.h"
 #include <string>
 
 using namespace std;
@@ -17,10 +18,6 @@ public:
     enum class ip_type{
         IPV4 =0,
         IPV6
-    };
-    enum class point_mode{
-        CLIENT = 0,
-        SERVER
     };
     typedef int backlog;
 public:
