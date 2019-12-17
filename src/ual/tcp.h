@@ -19,11 +19,15 @@ public:
         IPV4 =0,
         IPV6
     };
+    enum class poin_type{
+        SERVER = 0,
+        CLIENT 
+    };
     typedef int backlog;
 public:
-    int bind(const string & ipaddr,ip_type type, int port)
+    int bind(const string & ipaddr,ip_type type, int port, poin_type ty)
     {
-        return sub_this->tcp_bind(ipaddr,type, port);
+        return sub_this->tcp_bind(ipaddr,type, port, ty);
     }
 
     int connect(ip_type type, function<void(void)> tcp_call)
@@ -36,9 +40,10 @@ public:
         return sub_this->listen_stream(num,connection_call);
     }
 
-    int accept()
+    template<class StreamImpl>
+    int accept(const stream<StreamImpl> &strm)
     {
-        return sub_this->accept_data();
+        return sub_this->accept_data(strm);
     }
 
     void shutdown(function<void(void)> shutdown_cb)

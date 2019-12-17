@@ -19,20 +19,23 @@ int main()
 {
     libuv_executor executor;
     libuv_stream stream;
-    string buf;
-    const string &ip = "0.0.0.0";
-    const int port = 1280;
-    libuv_tcp tcp_server(executor,stream);
-    tcp_server.bind(ip,libuv_tcp::ip_type::IPV4,port);
+    libuv_stream stream2;
+  //  string buf;
+    const string &ip = "127.0.0.1";
+    const int port = 44556;
+    libuv_tcp tcp_server(executor,stream,libuv_tcp::poin_type::SERVER);
+    tcp_server.bind(ip,libuv_tcp::ip_type::IPV4,port,libuv_tcp::poin_type::SERVER);
     cout<<"bind----------\n";
-    tcp_server.listen(128,[&](){
+    int l_value = tcp_server.listen(128,[&](){
         cout<<"listen to ipaddr :"<<ip<<" port :"<<port<<endl;
-        tcp_server.accept();
-        cout<<"++++++++++++"<<endl;
-        stream.recv(50,buf,[&](const string &buf,size_t len){
+        int a_value = tcp_server.accept(stream2);
+        cout<<"accpet return value = "<<a_value<<endl;
+        int recv_return = stream2.recv([&](const string &buf,size_t len){
             cout<<"recv: "<<buf<<endl;
-            cout<<"recv char len : "<<len<<endl;
+            cout<<"recv char len : "<<len<<" buf = "<<strlen(buf.c_str())<<endl;
         });
+        cout<<"recv_return value = "<<recv_return<<endl;
     });
+    cout<<"listen return value = "<<l_value<<endl;
     call_c(executor);
 }

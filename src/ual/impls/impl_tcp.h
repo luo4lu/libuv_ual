@@ -18,33 +18,51 @@ public:
     };
 
     template<class ExecutorImpl,class StreamImpl>
-    libuv_tcp(const executor<ExecutorImpl> &exec,const stream<StreamImpl> &strm):
-    _tloop(const_cast<uv_loop_t *>(&(static_cast<const ExecutorImpl*>(&exec) -> loop))),
-    _ttcp(reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _tstream))))
+    libuv_tcp(const executor<ExecutorImpl> &exec,const stream<StreamImpl> &strm,poin_type ty):
+    _tloop(const_cast<uv_loop_t *>(&(static_cast<const ExecutorImpl*>(&exec) -> loop)))
     {
-        uv_tcp_init(_tloop,_ttcp);
+        if(ty == poin_type::SERVER)
+        {
+            _ttcp = reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _tstream)));
+            uv_tcp_init(_tloop,_ttcp);
+            tcp<libuv_tcp>::poin_type::SERVER;
+        }
+            
+        else if(ty == poin_type::CLIENT)
+        {
+            acc_client = reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _Ctstream)));
+            uv_tcp_init(_tloop,acc_client);
+            tcp<libuv_tcp>::poin_type::CLIENT;
+        }
+            
+        else
+        {
+            cout<<"input the correct endpoint type!"<<endl;
+        }
+        
     };
-    int tcp_bind(const string & ipaddr,ip_type type, int port);
+    int tcp_bind(const string & ipaddr,ip_type type, int port,poin_type ty);
 
     int tcp_connect(ip_type type, function<void(void)> tcp_call);
 
     int listen_stream(backlog num,function<void(void)> s_listen_call);
 
-    int accept_data();
+    template<class StreamImpl>
+    int accept_data(const stream<StreamImpl> &strm);
 
     void tcp_shutdown(function<void(void)> shutdown_cb);
 
 public:
     function<void(void)> connect_callback;
     uv_tcp_t *_ttcp;
-  //  uv_tcp_t _tclient;
+    uv_tcp_t *acc_client;
+    //uv_stream_t *stream_server;
     uv_connect_t _connect;
 public:
     function<void(void)> _listen_callback;
     function<void(void)> _shutdown_callback;
     uv_shutdown_t shutdown_req;
-//    uv_stream_t stream_server;
-//    uv_stream_t stream_client;
+
 private:
     uv_loop_t *_tloop;
     sockaddr_in ipv4_addr;
@@ -52,19 +70,25 @@ private:
 
 };    
 
-int libuv_tcp::tcp_bind(const string &ipaddr,ip_type type, int port)
+int libuv_tcp::tcp_bind(const string &ipaddr,ip_type type, int port,poin_type ty)
 {
     int ret;
     if(type == tcp<libuv_tcp>::ip_type::IPV4){
         ret = uv_ip4_addr(ipaddr.c_str(),port,&ipv4_addr);
         if(ret==0){
-            return uv_tcp_bind(this->_ttcp,reinterpret_cast<sockaddr*>(&ipv4_addr),0);
+            if(ty == poin_type::SERVER)
+                return uv_tcp_bind((this->_ttcp),reinterpret_cast<sockaddr*>(&ipv4_addr),0);
+            else
+            {
+                return uv_tcp_bind((this->acc_client),reinterpret_cast<sockaddr*>(&ipv4_addr),0);
+            }
+            
         }
     }
     else if(type == tcp<libuv_tcp>::ip_type::IPV6){
         ret = uv_ip6_addr(ipaddr.c_str(),port,&ipv6_addr);
         if(ret==0){
-            return uv_tcp_bind(this->_ttcp,reinterpret_cast<sockaddr*>(&ipv6_addr),0);
+            return uv_tcp_bind((this->_ttcp),reinterpret_cast<sockaddr*>(&ipv6_addr),0);
         }
     }
     else{
@@ -88,11 +112,11 @@ int libuv_tcp::tcp_connect(ip_type type, function<void(void)> tcp_call)
     this->connect_callback = tcp_call;
     if(type == tcp<libuv_tcp>::ip_type::IPV4)
     {
-        return uv_tcp_connect(&(this->_connect), this->_ttcp,reinterpret_cast<sockaddr *>(&(this->ipv4_addr)),connect_cb);
+        return uv_tcp_connect(&(this->_connect), (this->acc_client),reinterpret_cast<sockaddr *>(&(this->ipv4_addr)),connect_cb);
     }
     else if(type == tcp<libuv_tcp>::ip_type::IPV6)
     {
-        return uv_tcp_connect(&(this->_connect), this->_ttcp,reinterpret_cast<sockaddr *>(&(this->ipv6_addr)),connect_cb);
+        return uv_tcp_connect(&(this->_connect), (this->acc_client),reinterpret_cast<sockaddr *>(&(this->ipv6_addr)),connect_cb);
     }
 }
 
@@ -109,16 +133,22 @@ static void listen_cb(uv_stream_t * server, int status)
 
 int libuv_tcp::listen_stream(backlog num,function<void(void)> s_listen_call)
 {
-    uv_handle_set_data(reinterpret_cast<uv_handle_t *>(this->_ttcp),this);
+    uv_handle_set_data(reinterpret_cast<uv_handle_t *>((this->_ttcp)),this);
     this->_listen_callback = s_listen_call;
-    return uv_listen((uv_stream_t *)(this->_ttcp),num,listen_cb);
+    return uv_listen((uv_stream_t *)((this->_ttcp)),num,listen_cb);
 }
 
-int libuv_tcp::accept_data()
+template<class StreamImpl>
+int libuv_tcp::accept_data(const stream<StreamImpl> &strm)
 {
-    uv_stream_t acc_client;
-    uv_tcp_init(this->_tloop,(uv_tcp_t*)&acc_client);
-    return uv_accept((uv_stream_t *)(this->_ttcp),&acc_client);
+    uv_tcp_t *_client = reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _Ctstream)));
+    _client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t));
+    uv_tcp_init(this->_tloop, _client);
+    cout<<"stream transport type : "<<this->_ttcp->type<<endl;
+    int value = uv_accept((uv_stream_t *)((this->_ttcp)),(uv_stream_t *)_client);
+    if(value != 0)
+        uv_close((uv_handle_t *)_client,NULL);
+    return value;
 }
 
 static void sd_cb(uv_shutdown_t *sd,int status)
@@ -134,7 +164,7 @@ void libuv_tcp::tcp_shutdown(function<void(void)> shutdown_cb)
 {
     uv_handle_set_data(reinterpret_cast<uv_handle_t *>(&(this->shutdown_req)),this);
     this->_shutdown_callback = shutdown_cb;
-    uv_shutdown(&shutdown_req,(uv_stream_t *)(this->_ttcp),sd_cb);
+    uv_shutdown(&shutdown_req,(uv_stream_t *)((this->_ttcp)),sd_cb);
 }
 
 }

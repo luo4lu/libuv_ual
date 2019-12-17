@@ -15,14 +15,14 @@ class stream:public __this_subclass<Impl>{
     using __this_subclass<Impl>::sub_this;
 public:
     
-    void recv(size_t len,string &buf,function<void(const string &_buf,size_t _len)> recv_call)
+    int recv( function<void(const string &_buf,size_t _len)> recv_call)
     {
-        sub_this->recv_data(len,buf,recv_call);
+        return sub_this->recv_data(recv_call);
     }
 
-    void send(const string &buf,int nbuf, function<void(void)> send_call)
+    int send(const string &buf,int nbuf, function<void(void)> send_call)
     {
-        sub_this->send_data(buf, nbuf, send_call);
+        return sub_this->send_data(buf, nbuf, send_call);
     }
 
     int stop()
