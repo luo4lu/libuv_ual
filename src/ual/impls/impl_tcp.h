@@ -30,7 +30,7 @@ public:
             
         else if(ty == poin_type::CLIENT)
         {
-            acc_client = reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _Ctstream)));
+            acc_client = reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _tstream)));
             uv_tcp_init(_tloop,acc_client);
             tcp<libuv_tcp>::poin_type::CLIENT;
         }
@@ -142,9 +142,9 @@ template<class StreamImpl>
 int libuv_tcp::accept_data(const stream<StreamImpl> &strm)
 {
     uv_tcp_t *_client = reinterpret_cast<uv_tcp_t *>(const_cast<uv_stream_t *>(&(static_cast<const StreamImpl*>(&strm) -> _Ctstream)));
-    _client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t));
+    //_client = (uv_tcp_t *)malloc(sizeof(uv_tcp_t));
     uv_tcp_init(this->_tloop, _client);
-    cout<<"stream transport type : "<<this->_ttcp->type<<endl;
+    cout<<"stream transport type : "<<_client->type<<endl;
     int value = uv_accept((uv_stream_t *)((this->_ttcp)),(uv_stream_t *)_client);
     if(value != 0)
         uv_close((uv_handle_t *)_client,NULL);

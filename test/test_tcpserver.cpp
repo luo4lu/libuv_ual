@@ -22,7 +22,7 @@ int main()
     libuv_stream stream2;
   //  string buf;
     const string &ip = "127.0.0.1";
-    const int port = 44556;
+    const int port = 12345;
     libuv_tcp tcp_server(executor,stream,libuv_tcp::poin_type::SERVER);
     tcp_server.bind(ip,libuv_tcp::ip_type::IPV4,port,libuv_tcp::poin_type::SERVER);
     cout<<"bind----------\n";
