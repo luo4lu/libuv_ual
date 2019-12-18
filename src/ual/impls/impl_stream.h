@@ -55,7 +55,6 @@ static void recv_cb(uv_stream_t *_hstream,ssize_t nread,const uv_buf_t *buf)
     }
     uv_buf_init(buf->base,nread);
     _read->_recv_call(buf->base,nread); 
-    delete(buf->base);
 }
 
 int libuv_stream::recv_data(function<void(const string &_buf,size_t _len)> recv_call)
