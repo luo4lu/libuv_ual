@@ -22,10 +22,10 @@ int main()
     const string &buf = "hello server,It's me Client!";
     const string &ip = "127.0.0.1";
     const int port = 12345;
-    libuv_tcp tcp_client(executor,stream,libuv_tcp::poin_type::CLIENT);
+    libuv_tcp tcp_client(executor,stream);
 
-    tcp_client.bind(ip,libuv_tcp::ip_type::IPV4,port,libuv_tcp::poin_type::CLIENT);
-    tcp_client.connect(libuv_tcp::ip_type::IPV4,[&tcp_client,&stream](){
+    tcp_client.bind(ip,libuv_tcp::ip_type::IPV4,port);
+    tcp_client.connect(libuv_tcp::ip_type::IPV4,[&buf,&tcp_client,&stream](){
         cout<<"connect callback success,do not data send or recv "<<endl;
         for(int i=0;i<1000;i++)
             for(int j=0;j<1000;j++)
@@ -33,11 +33,19 @@ int main()
         //tcp_client.shutdown([](){
          //   cout<<"close tcp transport server!!"<<endl;
       //  });
-        int send_return = stream.send("hello server,It's me Client!",1,[&](){
-            cout<<"callback stream send function!!"<<endl;
-            cout<< "send_return22 = "<<send_return<<endl; 
-            });
-        cout<< "send_return = "<<send_return<<endl; 
+        int i=100;
+        int send_return = stream.send(buf,1,[&](){
+        cout<<"callback stream send function!!"<<endl; 
+        });
+        stream.recv([&](const string &buf,size_t len){
+            cout<<"recv : "<<buf<<endl;
+            cout<<"buf length : "<<len<<endl;
+        });
+        cout<<" i = "<<i<<endl;
+        /*tcp_client.tcp_shutdown([&](){
+            cout<<"close tcp connect!!"<<endl;
+        });*/
+        //cout<< "send_return = "<<send_return<<endl; 
     });
 
     call_c(executor);

@@ -20,11 +20,12 @@ int main()
     libuv_executor executor;
     libuv_stream stream;
     libuv_stream stream2;
+    string buf2 = "form server\t";
   //  string buf;
     const string &ip = "127.0.0.1";
     const int port = 12345;
-    libuv_tcp tcp_server(executor,stream,libuv_tcp::poin_type::SERVER);
-    tcp_server.bind(ip,libuv_tcp::ip_type::IPV4,port,libuv_tcp::poin_type::SERVER);
+    libuv_tcp tcp_server(executor,stream);
+    tcp_server.bind(ip,libuv_tcp::ip_type::IPV4,port);
     cout<<"bind----------\n";
     int l_value = tcp_server.listen(128,[&](){
         cout<<"listen to ipaddr :"<<ip<<" port :"<<port<<endl;
@@ -33,6 +34,10 @@ int main()
         int recv_return = stream2.recv([&](const string &buf,size_t len){
             cout<<"recv: "<<buf<<endl;
             cout<<"recv char len : "<<len<<" buf = "<<strlen(buf.c_str())<<endl;
+            buf2 +=buf;
+            stream2.send(buf2,1,[&](){
+                cout<<"data send success!!"<<endl;
+            });
         });
         cout<<"recv_return value = "<<recv_return<<endl;
     });

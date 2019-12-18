@@ -34,37 +34,35 @@ public:
 
 static void alloc_cb(uv_handle_t *handle,size_t suggested_size,uv_buf_t *buf)
 {
-//    auto data = uv_handle_get_data(handle);
-//    auto _str = static_cast<libuv_stream *>(data);
-    buf->base = (char*)malloc(suggested_size);
+    buf->base = new char[suggested_size];
     if(buf->base == NULL)
     {
         cout<<"malloc fail~~~"<<endl;
         return ;
     }
     buf->len = suggested_size;
- //   uv_buf_init(buf->base,buf->len);
-//    _str->_recv_call(buf->base,buf->len);
 }
 
 static void recv_cb(uv_stream_t *_hstream,ssize_t nread,const uv_buf_t *buf)
 {
     auto data = uv_handle_get_data(reinterpret_cast<uv_handle_t*>(_hstream));
     auto _read = reinterpret_cast<libuv_stream *>(data);
-    if(nread < 0)
+    if(nread <= 0)
     {
+        delete(buf->base);
         uv_close((uv_handle_t *)_hstream,NULL);
         cout<<"read accept data error!! :"<<uv_err_name(nread)<<endl;
     }
     uv_buf_init(buf->base,nread);
     _read->_recv_call(buf->base,nread); 
+    delete(buf->base);
 }
 
 int libuv_stream::recv_data(function<void(const string &_buf,size_t _len)> recv_call)
 {
-    uv_handle_set_data(reinterpret_cast<uv_handle_t*>(&(this->_Ctstream)),this);
+    uv_handle_set_data(reinterpret_cast<uv_handle_t*>(&(this->_tstream)),this);
     this->_recv_call = recv_call;
-    int value = uv_read_start(&(this->_Ctstream),alloc_cb,recv_cb);
+    int value = uv_read_start(&(this->_tstream),alloc_cb,recv_cb);
     if(value != 0)
         cout<<uv_strerror(value)<<endl;
     return value;   
