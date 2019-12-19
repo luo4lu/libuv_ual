@@ -50,8 +50,15 @@ static void recv_cb(uv_stream_t *_hstream,ssize_t nread,const uv_buf_t *buf)
     if(nread <= 0)
     {
         delete(buf->base);
-        uv_close((uv_handle_t *)_hstream,NULL);
-        cout<<"read accept data error!! :"<<uv_err_name(nread)<<endl;
+        if(nread == 0)
+        {
+            uv_read_stop(_hstream);
+            cout<<"read accept data done!\n";
+        }
+        else{
+            uv_close((uv_handle_t *)_hstream,NULL);
+            cout<<"read accept data error!! :"<<uv_err_name(nread)<<endl;
+        }
     }
     uv_buf_init(buf->base,nread);
     _read->_recv_call(buf->base,nread); 
