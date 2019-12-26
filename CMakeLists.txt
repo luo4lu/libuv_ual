@@ -10,6 +10,7 @@ add_subdirectory(deps/libuv)
 
 include_directories(src)
 include_directories(deps/libuv/include)
+include_directories(deps/libcoap/include/coap2)
 
 if(CPP_SRC_LISTS)
     # Compile srcs to static library
@@ -35,6 +36,7 @@ foreach(TTEST ${TEST_LISTS})
     if(TARGET ${PROJECT_NAME})
         target_link_libraries(${TEST_TARGET_NAME} ${PROJECT_NAME})
         target_link_libraries(${TEST_TARGET_NAME} uv)
+        target_link_libraries(${TEST_TARGET_NAME} coap-2-openssl)
     endif()
     set_target_properties(${TEST_TARGET_NAME} PROPERTIES OUTPUT_NAME ${FILE_NAME})
     set_target_properties(${TEST_TARGET_NAME} PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/test)
