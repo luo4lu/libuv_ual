@@ -22,14 +22,14 @@ public:
     /*
      *@brief bind want use udp transport the address and port
      */
-    int common_bind(const string &dst_ipaddr,const string dst_port)
+    int common_bind(const string &dst_ipaddr,const string &dst_port)
     {
         return sub_this->udp_common_bind(dst_ipaddr,dst_port);
     }
 
-    int response_session(const string & src_ipaddr, const string &src_port,function<void(string &flag)> session_call)
+    int response_session(const string & src_ipaddr, const string &src_port,const string &data,function<void(const string &flag)> session_call)
     {
-        return sub_this->udp_response_session(src_ipaddr, src_port,session_call);
+        return sub_this->udp_response_session(src_ipaddr, src_port,data,session_call);
     }
 
     int request_context(const string & src_ipaddr,const string &src_port,function<void(const string &dst,string &src)> context_call)
@@ -37,9 +37,9 @@ public:
         return sub_this->udp_request_context( src_ipaddr, src_port, context_call);
     }
   
-    int request_data(string &data)
+    int get_data(string &data)
     {
-        return sub_this->udp_request_data(data);
+        return sub_this->udp_get_data(data);
     }
    
     int response_data(string &ack)
