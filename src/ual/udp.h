@@ -5,6 +5,11 @@
 #include "ual/helper/this_subclass.h"
 #include <string>
 
+#define CONTAINING_RECORD(addr,type,field) ((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
+//　　addr:  结构体中某个成员变量的地址
+//　　type:  结构体的原型
+//　　field: 结构体的某个成员(与前面相同)
+
 using namespace std;
 
 namespace UAL_NAMESPACE{
@@ -27,17 +32,17 @@ public:
         return sub_this->udp_common_bind(dst_ipaddr,dst_port);
     }
 
-    int response_session(const string & src_ipaddr, const string &src_port,const string &data,function<void(const string &flag)> session_call)
+    int request_context(const string & src_ipaddr, const string &src_port,const string &data,function<void(string flag)> session_call)
     {
-        return sub_this->udp_response_session(src_ipaddr, src_port,data,session_call);
+        return sub_this->udp_request_context(src_ipaddr, src_port,data,session_call);
     }
 
-    int request_context(const string & src_ipaddr,const string &src_port,function<void(const string &dst,string &src)> context_call)
+    int response_session(const string & resource,const string &ack, function<void(void)> context_call)
     {
-        return sub_this->udp_request_context( src_ipaddr, src_port, context_call);
+        return sub_this->udp_response_session( resource, ack,context_call);
     }
   
-    int get_data(string &data)
+    int get_data(string data)
     {
         return sub_this->udp_get_data(data);
     }

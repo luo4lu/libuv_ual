@@ -9,9 +9,11 @@ using namespace ual;
 int main()
 {
     libcoap_udp client_udp;
+    char data[1024];
     client_udp.common_bind("0.0.0.0","123456");
-    client_udp.response_session("127.0.0.1","12345","hello",[&](const string &flag){
+    client_udp.request_context("127.0.0.1","12345","hello",[&](string flag){
         cout<<"runing test udp client\n"<<"data:"<<flag<<endl;
+        client_udp.get_data(flag);
     });
     return 0;
 }
