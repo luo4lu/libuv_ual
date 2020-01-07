@@ -32,22 +32,22 @@ public:
         return sub_this->udp_common_bind(dst_ipaddr,dst_port);
     }
 
-    int request_context(const string & src_ipaddr, const string &src_port,const string &data,function<void(string flag)> session_call)
+    int request_context(const string & hostname, const string &api,const char *data,function<void(char * flag)> session_call)
     {
-        return sub_this->udp_request_context(src_ipaddr, src_port,data,session_call);
+        return sub_this->udp_request_context(hostname, api,data,session_call);
     }
 
-    int response_session(const string & resource,const string &ack, function<void(void)> context_call)
+    int response_session(const char *resource, function<void(const char *src,char *dst)> context_call)
     {
-        return sub_this->udp_response_session( resource, ack,context_call);
+        return sub_this->udp_response_session( resource,context_call);
     }
   
-    int get_data(string data)
+    int get_data(uint8_t* data)
     {
         return sub_this->udp_get_data(data);
     }
    
-    int response_data(string &ack)
+    int response_data(char *ack)
     {
         return sub_this->udp_response_data( ack);
     }

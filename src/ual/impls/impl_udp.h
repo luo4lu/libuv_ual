@@ -12,8 +12,7 @@
 #include "uv.h"
 
 namespace ual{
-
-static string tmp;
+char * tmp=NULL;
 coap_address_t *pp_addr = NULL;//用于回调函数指向类成员
 class libcoap_udp:public udp<libcoap_udp> {
 public:
@@ -24,13 +23,13 @@ public:
     }
     int udp_common_bind(const string &dst_ipaddr,const string &dst_port);
 
-    int udp_request_context(const string & src_ipaddr, const string &src_port,const string &data,function<void(string flag)> session_call);
+    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *data,function<void(char * flag)> session_call);
 
-    int udp_response_session(const string & resource,const string &ack,function<void(void)>context_call);
+    int udp_response_session(const char *resource,function<void(const char *src,char *dst)>context_call);
   
-    int udp_get_data(string data);
+    int udp_get_data(uint8_t *data);
    
-    int udp_response_data(string &ack);
+    int udp_response_data(char *ack);
    
     void udp_close(); 
 
@@ -43,8 +42,9 @@ public:
     coap_session_t *_session;
     coap_str_const_t *_ruri;
 public:
-    function<void(string flag)> _session_call;
-    function<void(void)>_context_call;
+    function<void(char * flag)> _session_call;
+    function<void(const char *src,char *dst)>_context_call;
+    char *_response_data = NULL;
 private:
     
 };
@@ -91,16 +91,14 @@ static void request_handle(struct coap_context_t *context,
 {
     libcoap_udp *p_pdu = CONTAINING_RECORD(pp_addr, libcoap_udp, _dst);
     coap_show_pdu(LOG_INFO,received); 
-    char *receive_data = (char *)malloc(received->used_size-(received->data-received->token));
-    memcpy(receive_data,received->data,received->used_size-(received->data-received->token));
-    p_pdu->_session_call(receive_data);
-    free(receive_data);
+    p_pdu->_session_call((char *)received->data);
 }
 
-int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const string &data, 
-                                        function<void(string flag)> session_call)
+int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const char *data, 
+                                        function<void(char *flag)> session_call)
 {
     coap_tid_t tid;
+    coap_startup();
     this->_ctx = coap_new_context(NULL);
     if(!this->_ctx){
         cout<<"creat Coap context failed!!"<<endl;
@@ -144,7 +142,7 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
         udp_close();
         return -1;
     }
-    coap_add_option(this->_pdu,COAP_OPTION_URI_PATH,data.length(),reinterpret_cast<const uint8_t *>(data.c_str()));
+    coap_add_option(this->_pdu,COAP_OPTION_URI_PATH,strlen(data),reinterpret_cast<const uint8_t *>(data));
     tid = coap_send(this->_session,this->_pdu);
     if(tid == COAP_INVALID_TID){
         cout<<"message_handler: error sending new request"<<endl;
@@ -152,14 +150,14 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
     }
     pp_addr = &this->_dst;
     this->_session_call = session_call;
-    coap_run_once(this->_ctx,0);
+    coap_run_once(this->_ctx,5000);
     udp_close();
     return 0;  
 }
 
-int libcoap_udp::udp_get_data(string data)
+int libcoap_udp::udp_get_data(uint8_t* data)
 {
-    size_t len = data.length();
+    size_t len = sizeof(data);
     cout<<"received data len = "<<len<<endl;
     if(len>0)
         cout<<"received data = "<<data<<endl;
@@ -175,20 +173,23 @@ static void response_handler(coap_context_t *ctx,
               coap_string_t *query,
               coap_pdu_t *response)
 {
+    cout<<"-------------------------";
     libcoap_udp *p_pdu = CONTAINING_RECORD(pp_addr, libcoap_udp, _dst);
     coap_show_pdu(LOG_INFO,request);
+    p_pdu->_context_call((char *)resource->uri_path->s,p_pdu->_response_data);
     response->code = COAP_RESPONSE_CODE(205);
-    coap_add_data(response,tmp.length(),reinterpret_cast<const uint8_t *>(tmp.c_str()));
-    p_pdu->_context_call();
+    coap_add_data(response,sizeof(p_pdu->_response_data),reinterpret_cast<const uint8_t *>(p_pdu->_response_data));
+    free(p_pdu->_response_data);
+    p_pdu->_response_data = NULL;
     cout<<"receive request data: "<<resource->uri_path->s<<endl;
     cout<<"has been send response data :"<<response->data<<endl;
 }
 
-int libcoap_udp::udp_response_session(const string & request_data,const string &wait_response_data,
-                    function<void(void)>context_call)
+int libcoap_udp::udp_response_session(const char *request_data,
+                                    function<void(const char *src,char *dst)>context_call)
 {   
-    tmp = wait_response_data;
-    coap_str_const_t *ruri = coap_make_str_const(request_data.c_str());
+    coap_startup();
+    coap_str_const_t *ruri = coap_make_str_const(request_data);
     this->_ctx = coap_new_context(nullptr);
     if(!this->_ctx || !(this->_endpoint = coap_new_endpoint(this->_ctx,&this->_dst,COAP_PROTO_UDP))){
         cout<<"connot initialize context "<<endl;
@@ -197,18 +198,27 @@ int libcoap_udp::udp_response_session(const string & request_data,const string &
     }
     this->_resource = coap_resource_init(ruri,0);
     coap_register_handler(this->_resource,COAP_REQUEST_GET,response_handler);
-    
     coap_add_resource(this->_ctx,this->_resource);
     pp_addr = &this->_dst;
     this->_context_call = context_call;
     while(true)
-    {
+    {   
         coap_run_once(this->_ctx,0);
     }
     udp_close();
     return 0;
 }
-  
+
+int libcoap_udp::udp_response_data(char *ack)
+{
+    if(this->_response_data!=NULL)
+    {
+        free(this->_response_data);
+        this->_response_data = NULL;
+    }
+    this->_response_data = (char*)malloc(sizeof(ack));
+    strncpy(this->_response_data,ack,sizeof(ack));
+}
 void libcoap_udp::udp_close()
 {
     if(this->_session != NULL)
