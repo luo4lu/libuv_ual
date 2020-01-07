@@ -8,15 +8,17 @@ using namespace ual;
 
 int main()
 {
-    char receive[11] = "0x00000000";
-    char rep[8]="0";
+    char receive[10] = {"0x00a0x03"};
+    char rep[10]="0";
     libcoap_udp ser_udp;
     ser_udp.common_bind("0.0.0.0","123456");
     ser_udp.response_session(receive,[&](const char *src,char *dst){
         cout<<"runing udp_request_context successed"<<endl;
+        cout<<"received : "<<receive<<"\tsrc : "<<src<<endl;
         if(strcmp(receive,src) == 0)
         {
-            strncpy(rep ,"0x111111",sizeof(rep));
+            strncpy(rep ,receive,sizeof(receive));
+            rep[4] = 'b';
             ser_udp.udp_response_data(rep);
         }
     });

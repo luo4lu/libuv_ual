@@ -17,7 +17,7 @@ coap_address_t *pp_addr = NULL;//用于回调函数指向类成员
 class libcoap_udp:public udp<libcoap_udp> {
 public:
    
-    libcoap_udp():_ctx(NULL),_pdu(NULL),_resource(NULL),_endpoint(NULL),_session(NULL),_ruri(NULL)
+    libcoap_udp():_ctx(NULL),_pdu(NULL),_resource(NULL),_endpoint(NULL),_session(NULL),_ruri(NULL),_response_data(NULL)
     {
         coap_startup();
     }
@@ -27,7 +27,7 @@ public:
 
     int udp_response_session(const char *resource,function<void(const char *src,char *dst)>context_call);
   
-    int udp_get_data(uint8_t *data);
+    int udp_get_data(char *data);
    
     int udp_response_data(char *ack);
    
@@ -44,7 +44,7 @@ public:
 public:
     function<void(char * flag)> _session_call;
     function<void(const char *src,char *dst)>_context_call;
-    char *_response_data = NULL;
+    char *_response_data;
 private:
     
 };
@@ -155,9 +155,9 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
     return 0;  
 }
 
-int libcoap_udp::udp_get_data(uint8_t* data)
+int libcoap_udp::udp_get_data(char* data)
 {
-    size_t len = sizeof(data);
+    size_t len = strlen(data);
     cout<<"received data len = "<<len<<endl;
     if(len>0)
         cout<<"received data = "<<data<<endl;
@@ -173,12 +173,11 @@ static void response_handler(coap_context_t *ctx,
               coap_string_t *query,
               coap_pdu_t *response)
 {
-    cout<<"-------------------------";
     libcoap_udp *p_pdu = CONTAINING_RECORD(pp_addr, libcoap_udp, _dst);
     coap_show_pdu(LOG_INFO,request);
     p_pdu->_context_call((char *)resource->uri_path->s,p_pdu->_response_data);
     response->code = COAP_RESPONSE_CODE(205);
-    coap_add_data(response,sizeof(p_pdu->_response_data),reinterpret_cast<const uint8_t *>(p_pdu->_response_data));
+    coap_add_data(response,strlen(p_pdu->_response_data),reinterpret_cast<const uint8_t *>(p_pdu->_response_data));
     free(p_pdu->_response_data);
     p_pdu->_response_data = NULL;
     cout<<"receive request data: "<<resource->uri_path->s<<endl;
@@ -216,8 +215,9 @@ int libcoap_udp::udp_response_data(char *ack)
         free(this->_response_data);
         this->_response_data = NULL;
     }
-    this->_response_data = (char*)malloc(sizeof(ack));
-    strncpy(this->_response_data,ack,sizeof(ack));
+    int len = strlen(ack)+1;
+    this->_response_data = (char*)malloc(len);
+    strncpy(this->_response_data,ack,len);
 }
 void libcoap_udp::udp_close()
 {

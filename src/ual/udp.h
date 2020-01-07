@@ -42,7 +42,7 @@ public:
         return sub_this->udp_response_session( resource,context_call);
     }
   
-    int get_data(uint8_t* data)
+    int get_data(char* data)
     {
         return sub_this->udp_get_data(data);
     }
