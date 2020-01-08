@@ -11,7 +11,9 @@ int main()
     libcoap_udp client_udp;
     char data[1024];
     char send[10]={"0x00a0x03"};
+    cout<<"----------------"<<sizeof(send)<<endl;
     int i = 0;
+    client_udp.set_timeout(5);
     while(i<20)
     {
         cout<<"i == "<<i++<<endl;

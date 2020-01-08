@@ -37,9 +37,9 @@ public:
         return sub_this->udp_request_context(hostname, api,data,session_call);
     }
 
-    int response_session(const char *resource, function<void(const char *src,char *dst)> context_call)
+    int response_session(const char *key, const char *value,function<void(const char *src,char *dst)> context_call)
     {
-        return sub_this->udp_response_session( resource,context_call);
+        return sub_this->udp_response_session( key,value,context_call);
     }
   
     int get_data(char* data)
@@ -56,7 +56,17 @@ public:
     {
         sub_this->udp_close();
     }
-
+    /*
+     *@brief set timeout(send or receive before set this value)
+     *
+     * @params sec:set timeout second 
+     * 
+     * @return succeed: 0     failed: -1 
+     */
+    int set_timeout(unsigned int sec)
+    {
+        return sub_this->udp_set_timeout(sec);
+    }
 };
 
 

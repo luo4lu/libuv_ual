@@ -2,6 +2,7 @@
 #include "config.h"
 #include "ual/impls/impl_udp.h"
 #include <iostream>
+#include <string.h>
 
 using namespace std;
 using namespace ual;
@@ -9,10 +10,11 @@ using namespace ual;
 int main()
 {
     char receive[10] = {"0x00a0x03"};
-    char rep[10]="0";
+    char rep[1024]={"0"};
     libcoap_udp ser_udp;
     ser_udp.common_bind("0.0.0.0","123456");
-    ser_udp.response_session(receive,[&](const char *src,char *dst){
+    ser_udp.set_timeout(5);
+    ser_udp.response_session(receive,"/test/",[&](const char *src,char *dst){
         cout<<"runing udp_request_context successed"<<endl;
         cout<<"received : "<<receive<<"\tsrc : "<<src<<endl;
         if(strcmp(receive,src) == 0)
