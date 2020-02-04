@@ -11,6 +11,7 @@
 #include <coap2/coap.h>
 #include "uv.h"
 
+//using namespace libcoap;
 namespace ual{
 char * tmp=NULL;
 coap_address_t *pp_addr = NULL;//用于回调函数指向类成员

@@ -5,6 +5,7 @@
 #include "ual/helper/this_subclass.h"
 #include <string>
 
+//用于非类成员函数使用类对象
 #define CONTAINING_RECORD(addr,type,field) ((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
 //　　addr:  结构体中某个成员变量的地址
 //　　type:  结构体的原型
@@ -26,27 +27,64 @@ public:
 public:
     /*
      *@brief bind want use udp transport the address and port
+     *
+     *@params dst_ipaddr:end point IP address
+     *@params dst_port:end point port number
+     *
+     *@return succeed: 0     failed: -1 
      */
     int common_bind(const string &dst_ipaddr,const string &dst_port)
     {
         return sub_this->udp_common_bind(dst_ipaddr,dst_port);
     }
 
+    /*
+     *@brief Establishing a request context
+     *
+     * @params hostname:local ip addr or local hostname
+     * @params api:local point number
+     * @params data:send data of request data
+     * @params session_call:callback function 
+     * 
+     * @return succeed: 0     failed: -1 
+     */
     int request_context(const string & hostname, const string &api,const char *data,function<void(char * flag)> session_call)
     {
         return sub_this->udp_request_context(hostname, api,data,session_call);
     }
 
+    /*
+     *@brief Establishing a response session
+     *
+     * @params key:Identify the key in the session
+     * @params value:Identify the value in the session
+     * @params context_call:callback function 
+     * 
+     * @return succeed: 0     failed: -1 
+     */
     int response_session(const char *key, const char *value,function<void(const char *src,char *dst)> context_call)
     {
         return sub_this->udp_response_session( key,value,context_call);
     }
-  
+    
+    /*
+     *@brief recv point get data
+     *
+     * @params data:recv save data
+     * 
+     * @return succeed: 0     failed: -1 
+     */
     int get_data(char* data)
     {
         return sub_this->udp_get_data(data);
     }
-   
+    /*
+     *@brief Pass the data that needs to be sent
+     *
+     * @params ack:response data 
+     * 
+     * @return succeed: 0     failed: -1 
+     */
     int response_data(char *ack)
     {
         return sub_this->udp_response_data( ack);
