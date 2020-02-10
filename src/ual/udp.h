@@ -28,21 +28,21 @@ public:
     /*
      *@brief bind want use udp transport the address and port
      *
-     *@params dst_ipaddr:end point IP address
-     *@params dst_port:end point port number
+     *@params dst_ipaddr:local IP address
+     *@params dst_port:local port number
      *
      *@return succeed: 0     failed: -1 
      */
-    int common_bind(const string &dst_ipaddr,const string &dst_port)
+    int common_bind(const string &src_ipaddr,const string &src_port)
     {
-        return sub_this->udp_common_bind(dst_ipaddr,dst_port);
+        return sub_this->udp_common_bind(src_ipaddr,src_port);
     }
 
     /*
      *@brief Establishing a request context
      *
-     * @params hostname:local ip addr or local hostname
-     * @params api:local point number
+     * @params hostname:end on ip addr or hostname
+     * @params api:end on piont number
      * @params data:send data of request data
      * @params session_call:callback function 
      * 

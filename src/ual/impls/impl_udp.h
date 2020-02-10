@@ -132,7 +132,7 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
                 coap_address_init(&bind_addr);
                 bind_addr.size = rp->ai_addrlen;
                 memcpy(&bind_addr.addr,rp->ai_addr,rp->ai_addrlen);
-                this->_session = coap_new_client_session(this->_ctx,&bind_addr,&(this->_dst),COAP_PROTO_UDP);
+                this->_session = coap_new_client_session(this->_ctx,&(this->_dst),&bind_addr,COAP_PROTO_UDP);
                 if(this->_session)
                     break;
             }

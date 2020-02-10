@@ -12,7 +12,7 @@ int main()
     char receive[10] = {"0x00a0x03"};
     char rep[1024]={"0"};
     libcoap_udp ser_udp;
-    ser_udp.common_bind("0.0.0.0","123456");
+    ser_udp.common_bind("0.0.0.0","12345");
     ser_udp.set_timeout(5);
     ser_udp.response_session(receive,"/test/",[&](const char *src,char *dst){
         cout<<"runing udp_request_context successed"<<endl;
