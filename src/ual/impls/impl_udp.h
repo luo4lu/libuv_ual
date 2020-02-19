@@ -45,6 +45,7 @@ public:
     coap_endpoint_t *_endpoint;
     coap_session_t *_session;
     coap_str_const_t *_ruri;
+    coap_uri_t _uri;
     unsigned int _second;
 public:
     function<void(char * flag)> _session_call;
@@ -102,8 +103,25 @@ static void request_handle(struct coap_context_t *context,
 int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const char *data, 
                                         function<void(char *flag)> session_call)
 {
+    size_t buflen = 9;
+    unsigned char _buf[buflen];
+    unsigned char *buf = _buf;
+    char add_buf[1024];
+    int res;
     coap_tid_t tid;
     coap_startup();
+    string tmp = ipaddr + port;
+    strcpy(add_buf,tmp.c_str());
+    strcat(add_buf,data);
+    cout<<add_buf<<endl;
+    if(coap_split_uri((const uint8_t*)add_buf,strlen(add_buf),&_uri)<0){
+        cout<<"invalid coap uri\n";
+        return -1;
+    }
+    if(_uri.path.length)
+    {
+        res= coap_split_path(_uri.path.s,_uri.path.length,buf,&buflen);
+    }
     this->_ctx = coap_new_context(NULL);
     if(!this->_ctx){
         cout<<"creat Coap context failed!!"<<endl;
@@ -147,7 +165,7 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
         udp_close();
         return -1;
     }
-    coap_add_option(this->_pdu,COAP_OPTION_URI_PATH,strlen(data),reinterpret_cast<const uint8_t *>(data));
+    coap_add_option(this->_pdu,COAP_OPTION_URI_PATH,strlen((const char*)buf),reinterpret_cast<const uint8_t *>(buf));
     tid = coap_send(this->_session,this->_pdu);
     if(tid == COAP_INVALID_TID){
         cout<<"message_handler: error sending new request"<<endl;

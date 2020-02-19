@@ -9,7 +9,7 @@ using namespace ual;
 
 int main()
 {
-    char receive[10] = {"0x00a0x03"};
+    char receive[12] = {"0x00a0x03"};
     char rep[1024]={"0"};
     libcoap_udp ser_udp;
     ser_udp.common_bind("0.0.0.0","12345");
@@ -17,7 +17,7 @@ int main()
     ser_udp.response_session(receive,"/test/",[&](const char *src,char *dst){
         cout<<"runing udp_request_context successed"<<endl;
         cout<<"received : "<<receive<<"\tsrc : "<<src<<endl;
-        if(strcmp(receive,src) == 0)
+        if(strncmp(receive,src,9) == 0)
         {
             strncpy(rep ,receive,sizeof(receive));
             rep[4] = 'b';

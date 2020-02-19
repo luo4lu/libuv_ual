@@ -43,7 +43,7 @@ public:
      *
      * @params hostname:end on ip addr or hostname
      * @params api:end on piont number
-     * @params data:send data of request data
+     * @params data:send data of request resource
      * @params session_call:callback function 
      * 
      * @return succeed: 0     failed: -1 
@@ -68,9 +68,9 @@ public:
     }
     
     /*
-     *@brief recv point get data
+     *@brief recv point get data and show data
      *
-     * @params data:recv save data
+     * @params data:of response resource data
      * 
      * @return succeed: 0     failed: -1 
      */

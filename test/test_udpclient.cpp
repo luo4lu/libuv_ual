@@ -10,13 +10,15 @@ int main()
 {
     libcoap_udp client_udp;
     char data[1024];
-    char send[10]={"0x00a0x03"};
+    char send[12]={"0x00a0x03"};
     cout<<"----------------"<<sizeof(send)<<endl;
     int i = 0;
     client_udp.set_timeout(5);
     while(i<20)
     {
         cout<<"i == "<<i++<<endl;
+    sprintf(send+9,"%s%d","/",i);
+    cout<<"Send data = "<<send<<endl;
     client_udp.common_bind("0.0.0.0","123456");
     client_udp.request_context("127.0.0.1","12345",send,[&](char * flag){
         cout<<"runing test udp client\n"<<"data:"<<flag<<endl;
