@@ -48,9 +48,9 @@ public:
      * 
      * @return succeed: 0     failed: -1 
      */
-    int request_context(const string & hostname, const string &api,const char *data,function<void(char * flag)> session_call)
+    int request_context(const string & hostname, const string &api,const char *resource,function<void(char * flag)> session_call)
     {
-        return sub_this->udp_request_context(hostname, api,data,session_call);
+        return sub_this->udp_request_context(hostname, api,resource,session_call);
     }
 
     /*
@@ -62,9 +62,9 @@ public:
      * 
      * @return succeed: 0     failed: -1 
      */
-    int response_session(const char *key, const char *value,function<void(const char *src,char *dst)> context_call)
+    int response_session(const char *key,function<void(const char *src,char *dst)> context_call)
     {
-        return sub_this->udp_response_session( key,value,context_call);
+        return sub_this->udp_response_session( key,context_call);
     }
     
     /*

@@ -17,9 +17,7 @@ int main()
     while(i<20)
     {
         cout<<"i == "<<i++<<endl;
-    sprintf(send+9,"%s%d","/",i);
-    cout<<"Send data = "<<send<<endl;
-    client_udp.common_bind("0.0.0.0","123456");
+    client_udp.common_bind("0.0.0.0","9999");
     client_udp.request_context("127.0.0.1","12345",send,[&](char * flag){
         cout<<"runing test udp client\n"<<"data:"<<flag<<endl;
         if(client_udp.get_data(flag) != 0)

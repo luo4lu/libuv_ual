@@ -25,9 +25,9 @@ public:
     }
     int udp_common_bind(const string &dst_ipaddr,const string &dst_port);
 
-    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *data,function<void(char * flag)> session_call);
+    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *resource,function<void(char * flag)> session_call);
 
-    int udp_response_session(const char *key,const char *value,function<void(const char *src,char *dst)>context_call);
+    int udp_response_session(const char *key,function<void(const char *src,char *dst)>context_call);
   
     int udp_get_data(char *data);
    
@@ -100,7 +100,7 @@ static void request_handle(struct coap_context_t *context,
     p_pdu->_session_call((char *)received->data);
 }
 
-int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const char *data, 
+int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const char *resource, 
                                         function<void(char *flag)> session_call)
 {
     size_t buflen = 9;
@@ -110,7 +110,8 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
     int res;
     coap_tid_t tid;
     coap_startup();
-    string tmp = ipaddr + port;
+    /*待优化修改，暂时保留
+    string tmp = ipaddr + "/" +port+"/";
     strcpy(add_buf,tmp.c_str());
     strcat(add_buf,data);
     cout<<add_buf<<endl;
@@ -121,7 +122,7 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
     if(_uri.path.length)
     {
         res= coap_split_path(_uri.path.s,_uri.path.length,buf,&buflen);
-    }
+    }*/
     this->_ctx = coap_new_context(NULL);
     if(!this->_ctx){
         cout<<"creat Coap context failed!!"<<endl;
@@ -157,15 +158,17 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
         }
         freeaddrinfo(result);
     }
+
+    //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     coap_register_response_handler(this->_ctx,request_handle);
-    this->_pdu = coap_pdu_init(COAP_MESSAGE_CON,COAP_REQUEST_GET,coap_new_message_id(this->_session),coap_session_max_pdu_size(this->_session));
+    this->_pdu = coap_pdu_init(COAP_MESSAGE_CON,COAP_REQUEST_GET || COAP_REQUEST_POST,coap_new_message_id(this->_session),coap_session_max_pdu_size(this->_session));
     if(!this->_pdu)
     {
         cout<<"cannot create PDU\n";
         udp_close();
         return -1;
     }
-    coap_add_option(this->_pdu,COAP_OPTION_URI_PATH,strlen((const char*)buf),reinterpret_cast<const uint8_t *>(buf));
+    coap_add_option(this->_pdu,COAP_OPTION_URI_PATH,strlen((const char*)resource),reinterpret_cast<const uint8_t *>(resource));
     tid = coap_send(this->_session,this->_pdu);
     if(tid == COAP_INVALID_TID){
         cout<<"message_handler: error sending new request"<<endl;
@@ -206,12 +209,12 @@ static void response_handler(coap_context_t *ctx,
         free(p_pdu->_response_data);
         p_pdu->_response_data = NULL;
     }
+    //cout<<"remote port:"<<session->addr_info.remote.addr.sin.sin_port<<endl;
     cout<<"receive request data: "<<resource->uri_path->s<<endl;
     cout<<"has been send response data :"<<response->data<<endl;
 }
 
-int libcoap_udp::udp_response_session(const char *key,const char *value,
-                                    function<void(const char *src,char *dst)>context_call)
+int libcoap_udp::udp_response_session(const char *key,function<void(const char *src,char *dst)>context_call)
 {   
     coap_startup();
     coap_str_const_t *ruri = coap_make_str_const(key);
@@ -221,9 +224,9 @@ int libcoap_udp::udp_response_session(const char *key,const char *value,
         udp_close();
         return -1;
     }
+    //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     this->_resource = coap_resource_init(ruri,0);
-    coap_register_handler(this->_resource,COAP_REQUEST_GET,response_handler);
-    coap_add_attr(this->_resource,coap_make_str_const("title"),coap_make_str_const(value),0);
+    coap_register_handler(this->_resource,COAP_REQUEST_GET||COAP_REQUEST_POST,response_handler);
     coap_add_resource(this->_ctx,this->_resource);
     pp_addr = &this->_dst;
     this->_context_call = context_call;
