@@ -18,9 +18,9 @@ int main()
     {
         cout<<"i == "<<i++<<endl;
     client_udp.common_bind("0.0.0.0","9999");
-    client_udp.request_context("127.0.0.1","12345",send,[&](char * flag){
+    client_udp.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag){
         cout<<"runing test udp client\n"<<"data:"<<flag<<endl;
-        if(client_udp.get_data(flag) != 0)
+        if(client_udp.show_data(flag) != 0)
         {
             cout<<"get data failed!!"<<endl;
             

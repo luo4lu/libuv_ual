@@ -25,11 +25,11 @@ public:
     }
     int udp_common_bind(const string &dst_ipaddr,const string &dst_port);
 
-    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *resource,function<void(char * flag)> session_call);
+    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *resource,request_type type,function<void(char * flag)> session_call);
 
     int udp_response_session(const char *key,function<void(const char *src,char *dst)>context_call);
   
-    int udp_get_data(char *data);
+    int udp_show_data(char *data);
    
     int udp_response_data(char *ack);
 
@@ -52,7 +52,7 @@ public:
     function<void(const char *src,char *dst)>_context_call;
     char *_response_data;
 private:
-    
+    uint8_t _type;
 };
 
 int libcoap_udp::udp_common_bind(const string &ipaddr,const string &port)
@@ -101,7 +101,7 @@ static void request_handle(struct coap_context_t *context,
 }
 
 int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const char *resource, 
-                                        function<void(char *flag)> session_call)
+                                     request_type type, function<void(char *flag)> session_call)
 {
     size_t buflen = 9;
     unsigned char _buf[buflen];
@@ -161,7 +161,14 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
 
     //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     coap_register_response_handler(this->_ctx,request_handle);
-    this->_pdu = coap_pdu_init(COAP_MESSAGE_CON,COAP_REQUEST_GET || COAP_REQUEST_POST,coap_new_message_id(this->_session),coap_session_max_pdu_size(this->_session));
+    if(type == udp<libcoap_udp>::request_type::POST)
+        this->_type = COAP_REQUEST_POST;
+    else if(type == udp<libcoap_udp>::request_type::GET)
+        this->_type = COAP_REQUEST_GET;
+    else
+        cout<<"request type error!!"<<endl;
+
+    this->_pdu = coap_pdu_init(COAP_MESSAGE_CON,this->_type,coap_new_message_id(this->_session),coap_session_max_pdu_size(this->_session));
     if(!this->_pdu)
     {
         cout<<"cannot create PDU\n";
@@ -181,7 +188,7 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
     return 0;  
 }
 
-int libcoap_udp::udp_get_data(char* data)
+int libcoap_udp::udp_show_data(char* data)
 {
     size_t len = strlen(data);
     cout<<"received data len = "<<len<<endl;
@@ -226,7 +233,7 @@ int libcoap_udp::udp_response_session(const char *key,function<void(const char *
     }
     //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     this->_resource = coap_resource_init(ruri,0);
-    coap_register_handler(this->_resource,COAP_REQUEST_GET||COAP_REQUEST_POST,response_handler);
+    coap_register_handler(this->_resource,COAP_REQUEST_POST||COAP_REQUEST_GET,response_handler);
     coap_add_resource(this->_ctx,this->_resource);
     pp_addr = &this->_dst;
     this->_context_call = context_call;

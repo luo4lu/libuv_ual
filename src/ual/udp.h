@@ -20,9 +20,9 @@ class udp:public __this_subclass<Impl>{
     using __this_subclass<Impl>::sub_this;
 public:
 
-    enum class ip_type{
-        IPV4 = 0,
-        IPV6
+    enum class request_type{
+        POST = 0,
+        GET
     };
 public:
     /*
@@ -48,9 +48,9 @@ public:
      * 
      * @return succeed: 0     failed: -1 
      */
-    int request_context(const string & hostname, const string &api,const char *resource,function<void(char * flag)> session_call)
+    int request_context(const string & dst_ip, const string &dst_port,const char *resource,request_type type,function<void(char * recv_data)> session_call)
     {
-        return sub_this->udp_request_context(hostname, api,resource,session_call);
+        return sub_this->udp_request_context(dst_ip, dst_port,resource,type,session_call);
     }
 
     /*
@@ -74,9 +74,9 @@ public:
      * 
      * @return succeed: 0     failed: -1 
      */
-    int get_data(char* data)
+    int show_data(char* data)
     {
-        return sub_this->udp_get_data(data);
+        return sub_this->udp_show_data(data);
     }
     /*
      *@brief Pass the data that needs to be sent
