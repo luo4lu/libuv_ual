@@ -14,7 +14,7 @@ int main()
     libcoap_udp ser_udp;
     ser_udp.common_bind("127.0.0.1","12345");
     ser_udp.set_timeout(5);
-    ser_udp.response_session(receive,[&](const char *src,char *dst){
+    ser_udp.response_session(receive,libcoap_udp::request_type::POST,[&](const char *src,char *dst){
         cout<<"runing udp_request_context successed"<<endl;
         cout<<"received : "<<receive<<"\tsrc : "<<src<<endl;
         if(strncmp(receive,src,9) == 0)

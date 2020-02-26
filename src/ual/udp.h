@@ -62,9 +62,9 @@ public:
      * 
      * @return succeed: 0     failed: -1 
      */
-    int response_session(const char *key,function<void(const char *src,char *dst)> context_call)
+    int response_session(const char *key,request_type type,function<void(const char *src,char *dst)> context_call)
     {
-        return sub_this->udp_response_session( key,context_call);
+        return sub_this->udp_response_session( key,type,context_call);
     }
     
     /*

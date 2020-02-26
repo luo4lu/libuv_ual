@@ -27,7 +27,7 @@ public:
 
     int udp_request_context(const string & src_ipaddr, const string &src_port,const char *resource,request_type type,function<void(char * flag)> session_call);
 
-    int udp_response_session(const char *key,function<void(const char *src,char *dst)>context_call);
+    int udp_response_session(const char *key,request_type type,function<void(const char *src,char *dst)>context_call);
   
     int udp_show_data(char *data);
    
@@ -161,12 +161,17 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
 
     //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     coap_register_response_handler(this->_ctx,request_handle);
-    if(type == udp<libcoap_udp>::request_type::POST)
-        this->_type = COAP_REQUEST_POST;
-    else if(type == udp<libcoap_udp>::request_type::GET)
-        this->_type = COAP_REQUEST_GET;
-    else
-        cout<<"request type error!!"<<endl;
+    switch(type){
+        case udp<libcoap_udp>::request_type::POST:
+            this->_type = COAP_REQUEST_POST;
+            break;
+        case udp<libcoap_udp>::request_type::GET:
+            this->_type = COAP_REQUEST_GET;
+            break;
+        default:
+            cout<<"request type error!!"<<endl;
+            return -1;
+    }
 
     this->_pdu = coap_pdu_init(COAP_MESSAGE_CON,this->_type,coap_new_message_id(this->_session),coap_session_max_pdu_size(this->_session));
     if(!this->_pdu)
@@ -221,7 +226,7 @@ static void response_handler(coap_context_t *ctx,
     cout<<"has been send response data :"<<response->data<<endl;
 }
 
-int libcoap_udp::udp_response_session(const char *key,function<void(const char *src,char *dst)>context_call)
+int libcoap_udp::udp_response_session(const char *key,request_type type,function<void(const char *src,char *dst)>context_call)
 {   
     coap_startup();
     coap_str_const_t *ruri = coap_make_str_const(key);
@@ -233,7 +238,20 @@ int libcoap_udp::udp_response_session(const char *key,function<void(const char *
     }
     //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     this->_resource = coap_resource_init(ruri,0);
-    coap_register_handler(this->_resource,COAP_REQUEST_POST||COAP_REQUEST_GET,response_handler);
+
+    switch(type){
+        case udp<libcoap_udp>::request_type::POST:
+            this->_type = COAP_REQUEST_POST;
+            break;
+        case udp<libcoap_udp>::request_type::GET:
+            this->_type = COAP_REQUEST_GET;
+            break;
+        default:
+            cout<<"request type error!!"<<endl;
+            return -1;
+    }
+
+    coap_register_handler(this->_resource,this->_type,response_handler);
     coap_add_resource(this->_ctx,this->_resource);
     pp_addr = &this->_dst;
     this->_context_call = context_call;
