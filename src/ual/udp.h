@@ -5,12 +5,6 @@
 #include "ual/helper/this_subclass.h"
 #include <string>
 
-//用于非类成员函数使用类对象
-#define CONTAINING_RECORD(addr,type,field) ((type*)((unsigned char*)addr - (unsigned long)&((type*)0)->field))
-//　　addr:  结构体中某个成员变量的地址
-//　　type:  结构体的原型
-//　　field: 结构体的某个成员(与前面相同)
-
 using namespace std;
 
 namespace UAL_NAMESPACE{
@@ -44,6 +38,7 @@ public:
      * @params hostname:end on ip addr or hostname
      * @params api:end on piont number
      * @params data:send data of request resource
+     * @params type:request massege type include POST or GET
      * @params session_call:callback function 
      * 
      * @return succeed: 0     failed: -1 
@@ -58,6 +53,7 @@ public:
      *
      * @params key:Identify the key in the session
      * @params value:Identify the value in the session
+     * @params type:request massege type include POST or GET
      * @params context_call:callback function 
      * 
      * @return succeed: 0     failed: -1 
@@ -104,6 +100,34 @@ public:
     int set_timeout(unsigned int sec)
     {
         return sub_this->udp_set_timeout(sec);
+    }
+
+//------------------------------------------------------------------------
+    /*
+     *@brief coap ping interface for send null data
+     *
+     * @params ip_addr:client ip address 
+     * @params port:client port number
+     * @params type:request massege type include POST or GET
+     *
+     * @return succeed: 0     failed: -1 
+     */
+    int coap_ping(const string & ip_addr, const string &port,request_type type)
+    {
+        return sub_this->udp_coap_ping(ip_addr,port,type);
+    }
+
+    /*
+     *@brief check ip address and port yes or no have used
+     *
+     * @params ip_addr: ip address 
+     * @params port: port number
+     *
+     * @return succeed: ture     failed: false 
+     */
+    bool coap_check(const string & ip_addr, const string &port)
+    {
+        return sub_this->udp_coap_check(ip_addr,port);
     }
 };
 

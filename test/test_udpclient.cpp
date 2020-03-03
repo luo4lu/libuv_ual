@@ -14,8 +14,8 @@ int main()
     cout<<"----------------"<<sizeof(send)<<endl;
     int i = 0;
     client_udp.set_timeout(5);
-    while(i<20)
-    {
+    //while(i<20)
+    //{
         cout<<"i == "<<i++<<endl;
     client_udp.common_bind("0.0.0.0","9999");
     client_udp.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag){
@@ -28,6 +28,6 @@ int main()
         }
 
     });
-    }
+ //   }
     return 0;
 }
