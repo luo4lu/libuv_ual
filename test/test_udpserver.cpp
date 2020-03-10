@@ -26,8 +26,8 @@ int main()
             rep[4] = 'b';
             ser_udp.udp_response_data(rep);
         }
-        ser_udp2.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag){
-            cout<<"runing test udp client\n"<<"data:"<<flag<<endl;
+        ser_udp2.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag,unsigned int len){
+            cout<<"runing test udp client\n"<<"data:"<<flag<<"\t len = "<<len<<endl;
             if(ser_udp2.show_data(flag) != 0)
             {
                 cout<<"get data failed!!"<<endl;

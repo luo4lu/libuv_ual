@@ -23,7 +23,7 @@ public:
     }
     int udp_common_bind(const string &dst_ipaddr,const string &dst_port);
 
-    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *resource,request_type type,function<void(char * flag)> context_call);
+    int udp_request_context(const string & src_ipaddr, const string &src_port,const char *resource,request_type type,function<void(char * flag,unsigned int length)> context_call);
 
     int udp_response_session(const char *key,request_type type,function<void(const char *src,char *dst)>session_call);
   
@@ -50,7 +50,7 @@ public:
     coap_uri_t _uri;
     unsigned int _second;
 public:
-    function<void(char * flag)> _context_call;
+    function<void(char * flag,unsigned int len)> _context_call;
     function<void(const char *src,char *dst)>_session_call;
     char *_response_data;
 private:
@@ -100,11 +100,11 @@ static void request_handle(struct coap_context_t *context,
     auto data = coap_get_app_data(context);
     auto p_pdu = static_cast<libcoap_udp*>(data);
     coap_show_pdu(LOG_INFO,received); 
-    p_pdu->_context_call((char *)received->data);
+    p_pdu->_context_call((char *)received->data,strlen((char *)received->data));
 }
 
 int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,const char *resource, 
-                                     request_type type, function<void(char *flag)> context_call)
+                                     request_type type, function<void(char *flag,unsigned int length)> context_call)
 {
     coap_tid_t tid;
     coap_startup();
@@ -377,7 +377,10 @@ int libcoap_udp::udp_coap_ping(const string & ip_addr, const string &port,reques
 }
 bool libcoap_udp::udp_coap_check(const string & ip_addr, const string &port)
 {
-
+    char command[50];
+    sprintf(command,"lsof -i:%s",port.c_str());
+    cout<<command<<endl;
+    return system(command);
 }
 
 }

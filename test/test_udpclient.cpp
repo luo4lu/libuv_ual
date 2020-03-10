@@ -17,9 +17,11 @@ int main()
     //while(i<20)
     //{
         cout<<"i == "<<i++<<endl;
-    client_udp.common_bind("0.0.0.0","9999");
-    client_udp.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag){
-        cout<<"runing test udp client\n"<<"data:"<<flag<<endl;
+    client_udp.common_bind("0.0.0.0","12345");
+    bool check = client_udp.coap_check("0.0.0.0","12345");
+    cout<<check<<endl;
+    client_udp.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag,unsigned int len){
+        cout<<"runing test udp client\n"<<"data:"<<flag<<"\t len = "<<len<<endl;
         if(client_udp.show_data(flag) != 0)
         {
             cout<<"get data failed!!"<<endl;

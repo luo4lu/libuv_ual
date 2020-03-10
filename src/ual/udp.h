@@ -43,7 +43,7 @@ public:
      * 
      * @return succeed: 0     failed: -1 
      */
-    int request_context(const string & dst_ip, const string &dst_port,const char *resource,request_type type,function<void(char * recv_data)> session_call)
+    int request_context(const string & dst_ip, const string &dst_port,const char *resource,request_type type,function<void(char * recv_data,unsigned int len)> session_call)
     {
         return sub_this->udp_request_context(dst_ip, dst_port,resource,type,session_call);
     }
