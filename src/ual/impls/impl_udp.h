@@ -1,13 +1,23 @@
 #ifndef _UAL_IMPLS_IMPL_UDP_H
 #define _UAL_IMPLS_IMPL_UDP_H
 
+#ifdef WIN32
+#include <winsock2.h>
+#else
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <net/if.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <netdb.h>
+#include <sys/select.h>
+#endif
+#include <sys/ioctl.h>
 #include "config.h"
 #include "ual/udp.h"
 #include <iostream>
 #include <string>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netdb.h>
 #include <coap2/coap.h>
 #include "uv.h"
 
@@ -17,7 +27,7 @@ class libcoap_udp:public udp<libcoap_udp> {
 public:
    
     libcoap_udp():_ctx(NULL),_pdu(NULL),_resource(NULL),_endpoint(NULL),_session(NULL),_ruri(NULL),
-    _response_data(NULL),_second(0)
+    _response_data(NULL),_second(0),_socket_flag(NULL)
     {
         coap_startup();
     }
@@ -36,7 +46,7 @@ public:
     void udp_close(); 
 public: //ping and check port interface
     int udp_coap_ping(const string & ip_addr, const string &port,request_type type);
-    bool udp_coap_check(const string & ip_addr, const string &port);
+    bool udp_coap_check();
 
 
 public:
@@ -49,6 +59,7 @@ public:
     coap_str_const_t *_ruri;
     coap_uri_t _uri;
     unsigned int _second;
+    coap_socket_t * _socket_flag;
 public:
     function<void(char * flag,unsigned int len)> _context_call;
     function<void(const char *src,char *dst)>_session_call;
@@ -71,6 +82,7 @@ int libcoap_udp::udp_common_bind(const string &ipaddr,const string &port)
     if(error != 0)
     {
         cout<<"getaddrinfo: "<<gai_strerror(error)<<endl;
+        return -1;
     }
 
     for(ainfo=res;ainfo != NULL;ainfo = ainfo->ai_next){
@@ -85,6 +97,7 @@ int libcoap_udp::udp_common_bind(const string &ipaddr,const string &port)
         default:
             break;
         }
+        return -1;
     }
 finish:
     freeaddrinfo(res);
@@ -163,7 +176,7 @@ int libcoap_udp::udp_request_context(const string & ipaddr, const string &port,c
         }
         freeaddrinfo(result);
     }
-
+    this->_socket_flag = &(this->_session->sock);
     //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
     coap_register_response_handler(this->_ctx,request_handle);
     switch(type){
@@ -235,6 +248,7 @@ int libcoap_udp::udp_response_session(const char *key,request_type type,function
     coap_startup();
     coap_str_const_t *ruri = coap_make_str_const(key);
     this->_ctx = coap_new_context(nullptr);
+    this->_socket_flag = &(this->_ctx->sessions->sock);
     coap_set_app_data(this->_ctx,this);
     this->_session_call = session_call;
     if(!this->_ctx || !(this->_endpoint = coap_new_endpoint(this->_ctx,&this->_dst,COAP_PROTO_UDP))){
@@ -375,12 +389,37 @@ int libcoap_udp::udp_coap_ping(const string & ip_addr, const string &port,reques
     udp_close();
     return 0;
 }
-bool libcoap_udp::udp_coap_check(const string & ip_addr, const string &port)
+bool libcoap_udp::udp_coap_check()
 {
-    char command[50];
+    /*char command[50];
     sprintf(command,"lsof -i:%s",port.c_str());
-    cout<<command<<endl;
-    return system(command);
+    return system(command);*/
+    int interfaceNum = 0;
+    struct ifreq buf[16];
+    struct ifconf ifc;
+    struct ifreq ifrcopy;
+    char ip[32] = {0};
+
+    ifc.ifc_len = sizeof(buf);
+    ifc.ifc_buf = (caddr_t)buf;
+    if(!ioctl(this->_socket_flag->fd,SIOCGIFCONF,(char *)&ifc))
+    {
+        interfaceNum = ifc.ifc_len/sizeof(struct ifreq);
+        while(interfaceNum-- > 0)
+        {
+            if(!ioctl(this->_socket_flag->fd,SIOCGIFADDR,(char*)&buf[interfaceNum]))
+            {
+                snprintf(ip,sizeof(ip),"%s",
+                (char*)inet_ntoa(((struct sockaddr_in *)&(buf[interfaceNum].ifr_addr))->sin_addr));
+                cout<<"device ip :"<<ip<<endl;
+            }
+            else{
+                cout<<"ioctl function runing error!\n";
+                udp_close();
+                return -1;
+            }
+        }
+    }   
 }
 
 }

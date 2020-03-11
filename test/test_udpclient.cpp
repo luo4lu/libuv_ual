@@ -14,14 +14,14 @@ int main()
     cout<<"----------------"<<sizeof(send)<<endl;
     int i = 0;
     client_udp.set_timeout(5);
-    //while(i<20)
-    //{
+    while(i<20)
+    {
         cout<<"i == "<<i++<<endl;
-    client_udp.common_bind("0.0.0.0","12345");
-    bool check = client_udp.coap_check("0.0.0.0","12345");
-    cout<<check<<endl;
+    int len = client_udp.common_bind("0.0.0.0","6666");
+    cout<<"bind len ==="<<len<<endl;
     client_udp.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag,unsigned int len){
         cout<<"runing test udp client\n"<<"data:"<<flag<<"\t len = "<<len<<endl;
+        client_udp.coap_check();
         if(client_udp.show_data(flag) != 0)
         {
             cout<<"get data failed!!"<<endl;
@@ -30,6 +30,6 @@ int main()
         }
 
     });
- //   }
+    }
     return 0;
 }

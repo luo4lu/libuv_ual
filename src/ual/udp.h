@@ -125,9 +125,9 @@ public:
      *
      * @return succeed: ture     failed: false 
      */
-    bool coap_check(const string & ip_addr, const string &port)
+    bool coap_check()
     {
-        return sub_this->udp_coap_check(ip_addr,port);
+        return sub_this->udp_coap_check();
     }
 };
 
