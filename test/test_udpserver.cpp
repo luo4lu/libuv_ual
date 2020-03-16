@@ -20,13 +20,14 @@ int main()
     ser_udp.response_session(receive,libcoap_udp::request_type::POST,[&](const char *src,char *dst){
         cout<<"runing udp_request_context successed"<<endl;
         cout<<"received : "<<receive<<"\tsrc : "<<src<<endl;
+        ser_udp.coap_check();
         if(strncmp(receive,src,9) == 0)
         {
             strncpy(rep ,receive,sizeof(receive));
             rep[4] = 'b';
             ser_udp.udp_response_data(rep);
         }
-        ser_udp2.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag,unsigned int len){
+        /*ser_udp2.request_context("127.0.0.1","12345",send,libcoap_udp::request_type::POST,[&](char * flag,unsigned int len){
             cout<<"runing test udp client\n"<<"data:"<<flag<<"\t len = "<<len<<endl;
             if(ser_udp2.show_data(flag) != 0)
             {
@@ -34,7 +35,7 @@ int main()
                 
                 return -1;
             }
-        });
+        });*/
     });
     return 0;
 }

@@ -229,6 +229,7 @@ static void response_handler(coap_context_t *ctx,
 {
     auto data = coap_get_app_data(ctx);
     auto p_pdu = static_cast<libcoap_udp *>(data);
+    p_pdu->_socket_flag = &(session->sock);
     coap_show_pdu(LOG_INFO,request);
     p_pdu->_session_call((char *)resource->uri_path->s,p_pdu->_response_data);
     response->code = COAP_RESPONSE_CODE(205);
@@ -248,7 +249,7 @@ int libcoap_udp::udp_response_session(const char *key,request_type type,function
     coap_startup();
     coap_str_const_t *ruri = coap_make_str_const(key);
     this->_ctx = coap_new_context(nullptr);
-    this->_socket_flag = &(this->_ctx->sessions->sock);
+    
     coap_set_app_data(this->_ctx,this);
     this->_session_call = session_call;
     if(!this->_ctx || !(this->_endpoint = coap_new_endpoint(this->_ctx,&this->_dst,COAP_PROTO_UDP))){
@@ -257,6 +258,7 @@ int libcoap_udp::udp_response_session(const char *key,request_type type,function
         return -1;
     }
     //cout<<"port:"<<"\naddr:"<<this->_dst.addr.sin.sin_port<<endl;
+   // this->_socket_flag = &(this->_ctx->sessions->sock);
     this->_resource = coap_resource_init(ruri,0);
 
     switch(type){
@@ -391,9 +393,6 @@ int libcoap_udp::udp_coap_ping(const string & ip_addr, const string &port,reques
 }
 bool libcoap_udp::udp_coap_check()
 {
-    /*char command[50];
-    sprintf(command,"lsof -i:%s",port.c_str());
-    return system(command);*/
     int interfaceNum = 0;
     struct ifreq buf[16];
     struct ifconf ifc;
@@ -402,6 +401,7 @@ bool libcoap_udp::udp_coap_check()
 
     ifc.ifc_len = sizeof(buf);
     ifc.ifc_buf = (caddr_t)buf;
+    cout<<"socket fd == "<<this->_socket_flag->fd;
     if(!ioctl(this->_socket_flag->fd,SIOCGIFCONF,(char *)&ifc))
     {
         interfaceNum = ifc.ifc_len/sizeof(struct ifreq);
